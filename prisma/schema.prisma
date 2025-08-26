@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
@@ -21,67 +18,94 @@ model Customer {
   zipCode   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  orders Order[]
+  orders    Order[]
 
   @@map("customers")
 }
 
 model Order {
-  id                   String      @id @default(uuid())
-  orderNumber          String      @unique
-  customerId           String
-  customer             Customer    @relation(fields: [customerId], references: [id])
-  
-  // Pickup Details
-  pickupDate           DateTime
-  deliveryDate         DateTime?
-  service              String
-  specialInstructions  String?
-  
-  // Order Status
-  status               OrderStatus @default(PENDING)
-  totalAmount          Decimal     @db.Decimal(10, 2)
-  
-  // Timestamps
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
-  
-  // Relations
-  orderItems           OrderItem[]
-  statusHistory        OrderStatusHistory[]
+  id                  String               @id @default(uuid())
+  orderNumber         String               @unique
+  customerId          String
+  pickupDate          DateTime
+  deliveryDate        DateTime?
+  service             String
+  specialInstructions String?
+  status              OrderStatus          @default(PENDING)
+  totalAmount         Decimal              @db.Decimal(10, 2)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  orderItems          OrderItem[]
+  statusHistory       OrderStatusHistory[]
+  customer            Customer             @relation(fields: [customerId], references: [id])
 
+  @@index([customerId], map: "orders_customerId_fkey")
   @@map("orders")
 }
 
 model OrderItem {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   orderId     String
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  
   itemId      String
   itemName    String
   category    String
   serviceType String
-  price       Decimal @db.Decimal(10, 2)
+  price       Decimal  @db.Decimal(10, 2)
   quantity    Int
-  subtotal    Decimal @db.Decimal(10, 2)
-  
+  subtotal    Decimal  @db.Decimal(10, 2)
   createdAt   DateTime @default(now())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  @@index([orderId], map: "order_items_orderId_fkey")
   @@map("order_items")
 }
 
 model OrderStatusHistory {
   id        String      @id @default(uuid())
   orderId   String
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  
   status    OrderStatus
   notes     String?
   createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  @@index([orderId], map: "order_status_history_orderId_fkey")
   @@map("order_status_history")
+}
+
+model Service {
+  id              String        @id @default(uuid())
+  slug            String        @unique
+  title           String
+  description     String        @db.Text
+  fullDescription String        @db.Text
+  rating          Float         @default(5)
+  reviews         Int           @default(0)
+  duration        String
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  serviceItems    ServiceItem[]
+
+  @@map("services")
+}
+
+model ServiceItem {
+  id          String   @id @default(uuid())
+  serviceId   String
+  itemId      String
+  name        String
+  description String   @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  unit        String?
+  image       String?
+  category    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, itemId, category])
+  @@map("service_items")
 }
 
 enum OrderStatus {
@@ -93,43 +117,4 @@ enum OrderStatus {
   OUT_FOR_DELIVERY
   DELIVERED
   CANCELLED
-}
-
-model Service {
-  id              String   @id @default(uuid())
-  slug            String   @unique
-  title           String
-  description     String   @db.Text
-  fullDescription String   @db.Text
-  rating          Float    @default(5.0)
-  reviews         Int      @default(0)
-  duration        String
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  serviceItems    ServiceItem[]
-
-  @@map("services")
-}
-
-model ServiceItem {
-  id          String  @id @default(uuid())
-  serviceId   String
-  service     Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  
-  itemId      String  // Original item ID from frontend
-  name        String
-  description String  @db.Text
-  price       Decimal @db.Decimal(10, 2)
-  unit        String?
-  image       String?
-  category    String  // men, women, children, or custom categories
-  
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([serviceId, itemId, category])
-  @@map("service_items")
 }
