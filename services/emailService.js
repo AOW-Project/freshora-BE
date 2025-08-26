@@ -17,7 +17,7 @@ class EmailService {
     const itemsList = items
       .map(
         (item) =>
-          `• ${item.name} (${item.category}) - Qty: ${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`,
+          `• ${item.name} (${item.category}) - Qty: ${item.quantity} - AED${(item.price * item.quantity).toFixed(2)}`,
       )
       .join("\n")
 
@@ -105,7 +105,7 @@ The Laundry Service Team
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${item.name}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">${item.category}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${item.quantity}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #16a34a;">$${(item.price * item.quantity).toFixed(2)}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #16a34a;">AED${(item.price * item.quantity).toFixed(2)}</td>
       </tr>
     `,
       )
@@ -129,7 +129,7 @@ The Laundry Service Team
             <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Order Confirmed!</h1>
             <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Your laundry is in expert hands</p>
             <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                #${orderNumber}
+                ${orderNumber}
             </div>
         </div>
         
@@ -152,7 +152,7 @@ The Laundry Service Team
                     </div>
                     <div>
                         <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Total Amount</p>
-                        <p style="margin: 0; color: #16a34a; font-weight: 700; font-size: 18px;">$${totalAmount.toFixed(2)}</p>
+                        <p style="margin: 0; color: #16a34a; font-weight: 700; font-size: 18px;">AED${totalAmount.toFixed(2)}</p>
                     </div>
                     <div>
                         <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Pickup Date</p>
@@ -353,7 +353,7 @@ The Laundry Service Team
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.category}</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.quantity).toFixed(2)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">AED${(item.price * item.quantity).toFixed(2)}</td>
       </tr>
     `,
       )
@@ -383,7 +383,7 @@ The Laundry Service Team
                 <p><strong>Service:</strong> ${service}</p>
                 <p><strong>Pickup Date:</strong> ${new Date(pickupDate).toLocaleDateString()}</p>
                 ${deliveryDate ? `<p><strong>Delivery Date:</strong> ${new Date(deliveryDate).toLocaleDateString()}</p>` : ""}
-                <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
+                <p><strong>Total Amount:</strong> AED${totalAmount.toFixed(2)}</p>
             </div>
             
             <h3>Items Ordered:</h3>

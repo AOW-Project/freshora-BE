@@ -2,47 +2,65 @@ const { PrismaClient } = require("@prisma/client")
 
 const prisma = new PrismaClient()
 
+// --- CORRECTED & COMPLETE DATA BASED ON YOUR PRICE LISTS ---
 const servicesData = [
+  // 1. LAUNDRY SERVICES (WASH & PRESS)
   {
     slug: "laundry-services",
-    title: "Laundry Services",
-    description: "Professional wash and fold laundry services for all your clothing needs",
-    fullDescription:
-      "Our comprehensive laundry services include washing, drying, and folding of all types of clothing. We use premium detergents and fabric softeners to ensure your clothes come back fresh and clean.",
+    title: "Laundry Services (Wash & Press)",
+    description: "Professional wash and press for all your clothing needs.",
+    fullDescription: "Our comprehensive laundry services include washing and pressing of all types of clothing. We use premium detergents to ensure your clothes come back fresh, clean, and wrinkle-free.",
     rating: 4.8,
     reviews: 245,
     duration: "24-48 hours",
     items: {
       men: [
-        { id: "m1", name: "T-Shirts", price: 3, description: "Cotton t-shirts, polo shirts" },
-        { id: "m2", name: "Shirts (Formal)", price: 5, description: "Dress shirts, business shirts" },
-        { id: "m3", name: "Pants/Trousers", price: 6, description: "Casual pants, formal trousers" },
-        { id: "m4", name: "Jeans", price: 7, description: "Denim jeans, casual wear" },
-        { id: "m5", name: "Suits", price: 15, description: "Two-piece suits, blazers" },
-        { id: "m6", name: "Underwear", price: 2, description: "Undergarments, socks" },
+        { id: "m1", name: "T-shirts/Shirts", price: 6, description: "Casual and formal shirts" },
+        { id: "m2", name: "Trouser", price: 6, description: "Casual pants, formal trousers" },
+        { id: "m3", name: "Kandora", price: 10, description: "Traditional Kandora" },
+        { id: "m4", name: "Ghatra", price: 8, description: "Headwear" },
+        { id: "m5", name: "Lungi", price: 6, description: "Casual wear" },
+        { id: "m6", name: "Shorts", price: 6, description: "Casual shorts" },
+        { id: "m7", name: "Cap/Tie", price: 5, description: "Caps and ties" },
+        { id: "m8", name: "Jacket/Coat", price: 15, description: "Light jackets and coats" },
+        { id: "m9", name: "Waist Coat", price: 10, description: "Formal waistcoats" },
+        { id: "m10", name: "Suit (2 pcs)", price: 20, description: "Two-piece suits" },
+        { id: "m11", name: "Suit (3 pcs)", price: 30, description: "Three-piece suits" },
+        { id: "m12", name: "Inner Wear", price: 3, description: "Undergarments" },
+        { id: "m13", name: "Socks (Pair)", price: 3, description: "Pairs of socks" },
+        { id: "m14", name: "Sweater", price: 10, description: "Knit sweaters" },
+        { id: "m15", name: "Handkerchiefs", price: 1, description: "Handkerchiefs" },
       ],
       women: [
-        { id: "w1", name: "T-Shirts/Tops", price: 3, description: "Casual tops, blouses" },
-        { id: "w2", name: "Dresses", price: 8, description: "Casual and formal dresses" },
-        { id: "w3", name: "Pants/Jeans", price: 6, description: "Trousers, jeans, leggings" },
-        { id: "w4", name: "Skirts", price: 5, description: "Mini, midi, maxi skirts" },
-        { id: "w5", name: "Blouses", price: 6, description: "Formal and casual blouses" },
-        { id: "w6", name: "Underwear/Lingerie", price: 2, description: "Undergarments, bras" },
+        { id: "w1", name: "T-shirts/Shirts", price: 6, description: "Casual tops, blouses" },
+        { id: "w2", name: "Trouser", price: 6, description: "Trousers, jeans, leggings" },
+        { id: "w3", name: "Abbaya", price: 10, description: "Traditional Abbaya" },
+        { id: "w4", name: "Scarf/Dupatta", price: 4, description: "Scarves and dupattas" },
+        { id: "w5", name: "Skirt/Shorts", price: 6, description: "Skirts and shorts" },
+        { id: "w6", name: "Full Dress", price: 12, description: "Casual and formal dresses" },
+        { id: "w7", name: "Salwar Kameez", price: 10, description: "Traditional attire" },
+        { id: "w8", name: "Blouse", price: 8, description: "Formal and casual blouses" },
+        { id: "w9", name: "Saree", price: 15, description: "Traditional Saree" },
+        { id: "w10", name: "Coat/Jacket", price: 15, description: "Jackets and coats" },
+        { id: "w11", name: "Suit (2 pcs)", price: 20, description: "Two-piece suits" },
+        { id: "w12", name: "Suit (3 pcs)", price: 30, description: "Three-piece suits" },
+        { id: "w13", name: "Sweater", price: 10, description: "Knit sweaters" },
+        { id: "w14", name: "Inner Wear", price: 3, description: "Undergarments, lingerie" },
       ],
-      children: [
-        { id: "c1", name: "T-Shirts", price: 2, description: "Kids casual t-shirts" },
-        { id: "c2", name: "Pants/Shorts", price: 3, description: "Kids pants and shorts" },
-        { id: "c3", name: "Dresses", price: 4, description: "Girls dresses" },
-        { id: "c4", name: "School Uniforms", price: 5, description: "School shirts, pants" },
-        { id: "c5", name: "Pajamas", price: 3, description: "Sleepwear, nightwear" },
-        { id: "c6", name: "Underwear", price: 1, description: "Kids undergarments" },
+       children: [
+        { id: "c1", name: "T-Shirt", price: 4, description: "For ages 2-12" },
+        { id: "c2", name: "Shorts/Skirt", price: 4, description: "For ages 2-12" },
+        { id: "c3", name: "Trousers", price: 5, description: "For ages 2-12" },
+        { id: "c4", name: "Dress", price: 8, description: "For ages 2-12" },
+        { id: "c5", name: "Jacket", price: 10, description: "For ages 2-12" },
       ],
     },
   },
+  // 2. DRY CLEANING SERVICES
   {
     slug: "dry-cleaning-services",
     title: "Dry Cleaning Services",
-    description: "Professional dry cleaning for delicate and formal garments",
+    description: "Professional dry cleaning for delicate and formal garments.",
     fullDescription:
       "Our dry cleaning services use eco-friendly solvents to clean delicate fabrics that cannot be washed with water. Perfect for suits, dresses, and specialty items.",
     rating: 4.9,
@@ -50,254 +68,214 @@ const servicesData = [
     duration: "2-3 days",
     items: {
       men: [
-        { id: "m1", name: "Suits", price: 20, description: "Two-piece business suits" },
-        { id: "m2", name: "Blazers", price: 15, description: "Sport coats, blazers" },
-        { id: "m3", name: "Dress Shirts", price: 8, description: "Formal dress shirts" },
-        { id: "m4", name: "Ties", price: 5, description: "Neckties, bow ties" },
-        { id: "m5", name: "Coats/Jackets", price: 25, description: "Winter coats, leather jackets" },
+        { id: "mdc1", name: "T-shirts/Shirts", price: 8, description: "Casual and formal shirts" },
+        { id: "mdc2", name: "Trouser", price: 8, description: "Casual pants, formal trousers" },
+        { id: "mdc3", name: "Kandora", price: 12, description: "Traditional Kandora" },
+        { id: "mdc4", name: "Ghatra", price: 10, description: "Headwear" },
+        { id: "mdc5", name: "Lungi", price: 8, description: "Casual wear" },
+        { id: "mdc6", name: "Shorts", price: 8, description: "Casual shorts" },
+        { id: "mdc7", name: "Cap/Tie", price: 7, description: "Caps and ties" },
+        { id: "mdc8", name: "Jacket/Coat", price: 20, description: "Blazers, winter coats" },
+        { id: "mdc9", name: "Waist Coat", price: 14, description: "Formal waistcoats" },
+        { id: "mdc10", name: "Suit (2 pcs)", price: 25, description: "Two-piece business suits" },
+        { id: "mdc11", name: "Suit (3 pcs)", price: 35, description: "Three-piece business suits" },
+        { id: "mdc12", name: "Inner Wear", price: 5, description: "Delicate undergarments" },
+        { id: "mdc13", name: "Socks (Pair)", price: 3, description: "Pairs of socks" },
+        { id: "mdc14", name: "Sweater", price: 14, description: "Delicate sweaters" },
+        { id: "mdc15", name: "Handkerchiefs", price: 3, description: "Handkerchiefs" },
       ],
       women: [
-        { id: "w1", name: "Dresses", price: 18, description: "Formal and cocktail dresses" },
-        { id: "w2", name: "Blouses", price: 10, description: "Silk and delicate blouses" },
-        { id: "w3", name: "Skirts", price: 12, description: "Formal and business skirts" },
-        { id: "w4", name: "Coats", price: 30, description: "Winter coats, fur coats" },
-        { id: "w5", name: "Evening Gowns", price: 35, description: "Formal evening wear" },
-      ],
-      children: [
-        { id: "c1", name: "Formal Wear", price: 12, description: "Kids formal suits, dresses" },
-        { id: "c2", name: "Coats", price: 15, description: "Kids winter coats" },
-        { id: "c3", name: "School Blazers", price: 10, description: "School uniform blazers" },
+        { id: "wdc1", name: "T-shirts/Shirts", price: 8, description: "Casual tops, blouses" },
+        { id: "wdc2", name: "Trouser", price: 8, description: "Trousers, jeans, leggings" },
+        { id: "wdc3", name: "Abbaya", price: 14, description: "Traditional Abbaya" },
+        { id: "wdc4", name: "Scarf/Dupatta", price: 6, description: "Scarves and dupattas" },
+        { id: "wdc5", name: "Skirt/Shorts", price: 8, description: "Skirts and shorts" },
+        { id: "wdc6", name: "Full Dress", price: 15, description: "Formal and cocktail dresses" },
+        { id: "wdc7", name: "Salwar Kameez", price: 12, description: "Traditional attire" },
+        { id: "wdc8", name: "Blouse", price: 10, description: "Silk and delicate blouses" },
+        { id: "wdc9", name: "Saree", price: 20, description: "Silk and formal Saree" },
+        { id: "wdc10", name: "Coat/Jacket", price: 20, description: "Winter coats, blazers" },
+        { id: "wdc11", name: "Suit (2 pcs)", price: 25, description: "Two-piece suits" },
+        { id: "wdc12", name: "Suit (3 pcs)", price: 35, description: "Three-piece suits" },
+        { id: "wdc13", name: "Sweater", price: 14, description: "Delicate sweaters" },
+        { id: "wdc14", name: "Inner Wear", price: 5, description: "Delicate undergarments" },
       ],
     },
   },
+  // 3. EXPRESS LAUNDRY (ADDED)
   {
     slug: "express-laundry-services",
     title: "Express Laundry Services",
-    description: "Fast turnaround laundry services for urgent needs",
+    description: "Same-day laundry services for when you're in a hurry.",
     fullDescription:
-      "When you need your laundry done quickly, our express services deliver. Choose from 8-hour, 24-hour, or standard turnaround times.",
-    rating: 4.7,
-    reviews: 156,
-    duration: "8-24 hours",
+      "Our express laundry service provides same-day turnaround for your urgent laundry needs. We prioritize express orders to ensure you get your garments back within hours, not days.",
+    rating: 4.9,
+    reviews: 55,
+    duration: "4-8 hours",
     items: {
-      "wash-and-fold": [
-        {
-          id: "e1",
-          name: "Express Wash & Fold - 8hrs",
-          unit: "Per KG",
-          price: 60,
-          description: "Fast wash and fold service completed within 8 hours",
-        },
-        {
-          id: "e2",
-          name: "Express Wash & Fold - 24hrs",
-          unit: "Per KG",
-          price: 30,
-          description: "Wash and fold service completed within 24 hours",
-        },
-        {
-          id: "e3",
-          name: "Normal Wash & Fold",
-          unit: "Per KG",
-          price: 15,
-          description: "Standard wash and fold service",
-        },
-      ],
-      "wash-and-iron": [
-        {
-          id: "e4",
-          name: "Express Wash & Iron - 6hrs",
-          unit: "Per KG",
-          price: 80,
-          description: "Fast wash and iron service completed within 6 hours",
-        },
-        {
-          id: "e5",
-          name: "Express Wash & Iron - 24hrs",
-          unit: "Per KG",
-          price: 40,
-          description: "Wash and iron service completed within 24 hours",
-        },
-        {
-          id: "e6",
-          name: "Normal Wash & Iron",
-          unit: "Per KG",
-          price: 20,
-          description: "Standard wash and iron service",
-        },
-      ],
+      "express": [
+        { id: "exp1", name: "Express Service Charge (per item)", price: 5, description: "Additional charge for express service" },
+      ]
     },
   },
+  // 4. SHOE & BAG SPA (SLUG CORRECTED)
   {
-    slug: "luxury-shoe-cleaning",
-    title: "Luxury Shoe Cleaning",
-    description: "Premium shoe cleaning and restoration services",
+    slug: "shoe-bag-spa",
+    title: "Shoe & Bag Spa",
+    description: "Premium cleaning and restoration services for footwear and bags.",
     fullDescription:
-      "Our luxury shoe cleaning service restores your footwear to like-new condition using specialized techniques and premium products.",
+      "Our specialized shoe and bag spa restores your items to like-new condition. We handle everything from sports sneakers to luxury designer items.",
     rating: 4.9,
     reviews: 98,
     duration: "3-5 days",
     items: {
-      men: [
-        {
-          id: "1",
-          name: "Men's Leather Shoe Deep Clean",
-          description: "Premium cleaning and conditioning for men's leather shoes to restore shine and remove dirt.",
-          price: 350,
-          image: "/images/shoes/men-leather.jpg",
-        },
-        {
-          id: "2",
-          name: "Men's Suede Shoe Treatment",
-          description: "Gentle suede cleaning to remove stains while preserving texture and color.",
-          price: 400,
-          image: "/images/shoes/men-suede.jpg",
-        },
-        {
-          id: "3",
-          name: "Men's Sneakers Restoration",
-          description: "Deep cleaning and whitening for men's sneakers, removing dirt and yellowing.",
-          price: 300,
-          image: "/images/shoes/men-sneakers.jpg",
-        },
-      ],
-      women: [
-        {
-          id: "4",
-          name: "Women's High Heel Cleaning",
-          description: "Specialized cleaning for delicate high heels and designer shoes.",
-          price: 380,
-          image: "/images/shoes/women-heels.jpg",
-        },
-        {
-          id: "5",
-          name: "Women's Suede Boot Care",
-          description: "Luxury treatment for suede boots, including stain removal and texture preservation.",
-          price: 420,
-          image: "/images/shoes/women-suede-boots.jpg",
-        },
-        {
-          id: "6",
-          name: "Women's Designer Sneakers Cleaning",
-          description: "Gentle yet effective cleaning for premium women's sneakers.",
-          price: 350,
-          image: "/images/shoes/women-sneakers.jpg",
-        },
-      ],
-      children: [
-        {
-          id: "7",
-          name: "Kids' School Shoe Cleaning",
-          description: "Durable and safe cleaning for children's school shoes.",
-          price: 250,
-          image: "/images/shoes/kids-school.jpg",
-        },
-        {
-          id: "8",
-          name: "Kids' Sports Shoes Cleaning",
-          description: "Deep cleaning for children's sports and activity shoes.",
-          price: 220,
-          image: "/images/shoes/kids-sports.jpg",
-        },
-        {
-          id: "9",
-          name: "Kids' Party Shoes Shine",
-          description: "Gentle cleaning for kids' formal and party shoes.",
-          price: 260,
-          image: "/images/shoes/kids-party.jpg",
-        },
+      "shoe-cleaning": [
+        { id: "s1", name: "Formal Shoes", price: 90, description: "Standard cleaning" },
+        { id: "s2", name: "Formal Shoes (Leather)", price: 90, description: "Specialized leather care" },
+        { id: "s3", name: "Formal Shoes (Mixed Materials)", price: 100, description: "For shoes with multiple materials" },
+        { id: "s4", name: "Sports Sneakers", price: 65, description: "Standard cleaning" },
+        { id: "s5", name: "Sports Sneakers (Leather)", price: 80, description: "Specialized leather care" },
+        { id: "s6", name: "Sports Sneakers (Mixed Materials)", price: 80, description: "For shoes with multiple materials" },
+        { id: "s7", name: "Designer Sneakers", price: 120, description: "Standard cleaning" },
+        { id: "s8", name: "Designer Sneakers (Leather)", price: 130, description: "Specialized leather care" },
+        { id: "s9", name: "Designer Sneakers (Mixed Materials)", price: 130, description: "For shoes with multiple materials" },
+        { id: "s10", name: "Sandals & Flip Flops", price: 60, description: "Standard cleaning" },
+        { id: "s11", name: "Sandals & Flip Flops (Leather)", price: 70, description: "Specialized leather care" },
+        { id: "s12", name: "Sandals & Flip Flops (Mixed Materials)", price: 70, description: "For footwear with multiple materials" },
+        { id: "s13", name: "Designer Sandals", price: 100, description: "Standard cleaning" },
+        { id: "s14", name: "Designer Sandals (Leather)", price: 115, description: "Specialized leather care" },
+        { id: "s15", name: "Designer Sandals (Mixed Materials)", price: 115, description: "For footwear with multiple materials" },
+        { id: "s16", name: "Designer Formal Shoes", price: 110, description: "Standard cleaning" },
+        { id: "s17", name: "Designer Formal Shoes (Leather)", price: 120, description: "Specialized leather care" },
+        { id: "s18", name: "Designer Formal Shoes (Mixed Materials)", price: 120, description: "For shoes with multiple materials" },
+        { id: "s19", name: "Kids Shoe Care (Any)", price: 50, description: "Gentle cleaning for any type of kids' shoes" },
+      ]
+    },
+  },
+  // 5. LUXURY SHOE CLEANING (ADDED)
+  {
+    slug: "luxury-shoe-cleaning",
+    title: "Luxury Shoe Cleaning",
+    description: "Specialized care for high-end designer shoes.",
+    fullDescription:
+      "Dedicated luxury shoe cleaning service for high-end footwear. Our certified specialists use premium products to maintain and restore your expensive shoes.",
+    rating: 5.0,
+    reviews: 42,
+    duration: "2-4 days",
+    items: {
+      "luxury-shoes": [
+        { id: "ls1", name: "Luxury Formal shoes", price: 120, description: "Premium cleaning for high-end formal shoes" },
+        { id: "ls2", name: "Luxury Sports Sneakers", price: 100, description: "Premium cleaning for high-end sneakers" },
+        { id: "ls3", name: "Luxury Designer Sneakers", price: 150, description: "Premium cleaning for high-end designer sneakers" },
+        { id: "ls4", name: "Luxury Sandals & Flip Flops", price: 100, description: "Premium cleaning for high-end sandals" },
+        { id: "ls5", name: "Luxury Designer Sandals", price: 120, description: "Premium cleaning for high-end designer sandals" },
+        { id: "ls6", name: "Luxury Designer Formal Shoes", price: 140, description: "Premium cleaning for high-end designer formal shoes" },
       ],
     },
   },
+  // 6. COMMERCIAL LAUNDRY
   {
     slug: "commercial-laundry-service",
     title: "Commercial Laundry Service",
-    description: "Bulk laundry services for businesses and institutions",
+    description: "Bulk laundry services for businesses and institutions.",
     fullDescription:
-      "Professional commercial laundry services for businesses, hotels, restaurants, and institutions. We handle large volumes with quick turnaround times.",
+      "Professional commercial laundry services for businesses, hotels, restaurants, and institutions. We handle large volumes with quick turnaround times. Prices to be shared upon request.",
     rating: 4.8,
     reviews: 67,
     duration: "1-2 days",
     items: {
-      men: [
-        {
-          id: "10",
-          name: "Men's Uniform Wash & Press",
-          description:
-            "Professional washing and pressing for men's office and industrial uniforms. Perfect for bulk corporate cleaning needs.",
-          price: 150,
-          image: "/images/laundry/men-uniform.jpg",
-        },
-        {
-          id: "11",
-          name: "Men's Workwear Deep Clean",
-          description: "Heavy-duty deep cleaning for men's workwear, removing oil, grease, and industrial stains.",
-          price: 180,
-          image: "/images/laundry/men-workwear.jpg",
-        },
-        {
-          id: "12",
-          name: "Men's Sportswear Sanitization",
-          description: "Odor-free sanitization for men's sports gear and jerseys, ideal for gyms and sports clubs.",
-          price: 140,
-          image: "/images/laundry/men-sportswear.jpg",
-        },
-      ],
-      women: [
-        {
-          id: "13",
-          name: "Women's Uniform Wash & Press",
-          description: "Corporate and industrial women's uniform laundry with professional pressing.",
-          price: 150,
-          image: "/images/laundry/women-uniform.jpg",
-        },
-        {
-          id: "14",
-          name: "Women's Work Apron Cleaning",
-          description: "Deep cleaning service for women's aprons used in hospitality and food services.",
-          price: 130,
-          image: "/images/laundry/women-apron.jpg",
-        },
-        {
-          id: "15",
-          name: "Women's Sportswear Bulk Cleaning",
-          description: "Bulk cleaning and sanitization for women's sports uniforms and training gear.",
-          price: 140,
-          image: "/images/laundry/women-sportswear.jpg",
-        },
-      ],
-      children: [
-        {
-          id: "16",
-          name: "Children's School Uniform Cleaning",
-          description: "Washing and pressing for children's school uniforms, available in bulk for institutions.",
-          price: 120,
-          image: "/images/laundry/kids-uniform.jpg",
-        },
-        {
-          id: "17",
-          name: "Children's Sports Kit Laundry",
-          description: "Thorough cleaning for kids' sports kits and activity uniforms.",
-          price: 110,
-          image: "/images/laundry/kids-sportskit.jpg",
-        },
-        {
-          id: "18",
-          name: "Children's Costume Cleaning",
-          description: "Specialized cleaning for kids' event costumes and performance wear.",
-          price: 130,
-          image: "/images/laundry/kids-costume.jpg",
-        },
+      "commercial-items": [
+          { id: "com1", name: "Bedsheets single", price: 0, description: "Price to be shared" },
+          { id: "com2", name: "Bedsheets Double", price: 0, description: "Price to be shared" },
+          { id: "com3", name: "Pillow Case", price: 0, description: "Price to be shared" },
+          { id: "com4", name: "Pillow Cover", price: 0, description: "Price to be shared" },
+          { id: "com5", name: "Face Towel", price: 0, description: "Price to be shared" },
+          { id: "com6", name: "Hand Towel", price: 0, description: "Price to be shared" },
+          { id: "com7", name: "Floor Matt", price: 0, description: "Price to be shared" },
+          { id: "com8", name: "Cushion Small", price: 0, description: "Price to be shared" },
+          { id: "com9", name: "Cushion Medium", price: 0, description: "Price to be shared" },
+          { id: "com10", name: "Cushion Large", price: 0, description: "Price to be shared" },
+          { id: "com11", name: "Bathrobe", price: 0, description: "Price to be shared" },
+          { id: "com12", name: "Table Napkin", price: 0, description: "Price to be shared" },
+          { id: "com13", name: "Duvet Cover Single", price: 0, description: "Price to be shared" },
+          { id: "com14", name: "Duvet Cover Large", price: 0, description: "Price to be shared" },
       ],
     },
   },
-]
+  // 7. HOUSEHOLD (SLUG CORRECTED FOR CURTAINS)
+  {
+    slug: "curtain-cleaning-service", // Frontend expects this for "Curtain Cleaning"
+    title: "Household & Curtain Cleaning",
+    description: "Professional cleaning for all your household items, including curtains.",
+    fullDescription:
+      "From bedsheets and curtains to wedding dresses, we provide expert cleaning services to keep your home fresh and clean.",
+    rating: 4.8,
+    reviews: 112,
+    duration: "2-4 days",
+    items: {
+      "household": [
+        { id: "h1", name: "Police Dress/Safari Dress", price: 14, description: "Uniform cleaning" },
+        { id: "h2", name: "Duvet Cover (Single/Double)", price: 10, description: "Single/Double" },
+        { id: "h3", name: "Blanket (Single/Double)", price: 22, description: "Single/Double" },
+        { id: "h4", name: "Bed Spread (Single/Double)", price: 20, description: "Single/Double" },
+        { id: "h5", name: "Bed Sheet (Single/Double)", price: 10, description: "Single/Double" },
+        { id: "h6", name: "Pillow Case", price: 3, description: "" },
+        { id: "h7", name: "Cushion Cover", price: 4, description: "" },
+        { id: "h8", name: "Pillow/Cushion", price: 15, description: "" },
+        { id: "h9", name: "Bath Rope", price: 10, description: "" },
+        { id: "h10", name: "Bath Towel (M/L)", price: 4, description: "Medium/Large" },
+        { id: "h11", name: "Hand/Face Towel", price: 3, description: "" },
+        { id: "h12", name: "Bath Mat (M/L)", price: 3, description: "Medium/Large" },
+        { id: "h13", name: "Table Cloth/Table Napkins", price: 8, description: "Table Cloth/Napkins" },
+        { id: "h14", name: "Shoe", price: 40, description: "" },
+        { id: "h15", name: "Wedding Dress Normal", price: 50, description: "" },
+        { id: "h16", name: "Curtains (Per Sq meter)", price: 10, description: "Wash & Press" },
+      ],
+    },
+  },
+  // 8. CARPET CLEANING
+  {
+    slug: "carpet-cleaning-services",
+    title: "Carpet Cleaning Service",
+    description: "Specialized washing and steam cleaning for all types of carpets.",
+    fullDescription:
+      "Our carpet cleaning services deep clean and restore your carpets, from standard rugs to premium silk and Persian carpets.",
+    rating: 4.9,
+    reviews: 78,
+    duration: "3-5 days",
+    items: {
+      "carpet-cleaning": [
+        { id: "cc1", name: "Standard Carpet SQM (wash only)", price: 20, description: "Per square meter" },
+        { id: "cc2", name: "Premium Carpet - Silk, Wool, Persian, etc (wash only)", price: 80, description: "Per square meter, for delicate carpets" },
+        { id: "cc3", name: "Prayer Matt", price: 15, description: "Standard size prayer matts" },
+        { id: "cc4", name: "Standard Carpet Sqm (Steam)", price: 12, description: "Per square meter, steam cleaning" },
+        { id: "cc5", name: "Premium Carpet - Silk, Wool, Persian, etc (steam)", price: 50, description: "Per square meter, for delicate carpets" },
+      ],
+    },
+  },
+  // 9. SOFT TOY CLEANING
+  {
+    slug: "soft-toy-cleaning-service",
+    title: "Soft Toy Cleaning Service",
+    description: "Gentle and hygienic cleaning for soft toys.",
+    fullDescription: "We provide safe and thorough cleaning for soft toys of all sizes, ensuring they are fresh and hygienic.",
+    rating: 4.7,
+    reviews: 45,
+    duration: "2-3 days",
+    items: {
+      "toy-cleaning": [
+        { id: "st1", name: "Soft toy cleaning and washing", price: 20, description: "Standard price, may vary based on toy type" },
+      ],
+    },
+  },
+];
+
 
 async function seedServices() {
   try {
-    console.log("🌱 Starting services seeding...")
+    console.log("🌱 Starting services seeding with updated price list...")
 
-    // Clear existing services
+    // Clear existing services and items to ensure a fresh start
     await prisma.serviceItem.deleteMany()
     await prisma.service.deleteMany()
 
@@ -317,7 +295,7 @@ async function seedServices() {
         },
       })
 
-      // Create service items
+      // Create service items for each category
       for (const [category, items] of Object.entries(serviceData.items)) {
         console.log(`  📦 Adding ${items.length} items for category: ${category}`)
 
@@ -339,7 +317,7 @@ async function seedServices() {
     }
 
     console.log("✅ Services seeding completed successfully!")
-    console.log(`📊 Created ${servicesData.length} services with their items`)
+    console.log(`📊 Created ${servicesData.length} services with their items based on the new price list.`)
   } catch (error) {
     console.error("❌ Error seeding services:", error)
     throw error
