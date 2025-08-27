@@ -14,8 +14,6 @@ const prisma = new PrismaClient()
 // This allows your FRONTEND_URL to be a comma-separated list
 const allowedOrigins = (process.env.FRONTEND_URL );
 
-const cors = require("cors");
-
 app.use(
   cors({
     origin: "*", // allow all origins
