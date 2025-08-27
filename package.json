@@ -1,6 +1,18 @@
 {
   "name": "freshora-backend",
   "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/AOW-Project/freshora-BE#readme",
+  "bugs": {
+    "url": "https://github.com/AOW-Project/freshora-BE/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AOW-Project/freshora-BE.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -26,8 +38,5 @@
   "devDependencies": {
     "nodemon": "^3.0.2",
     "prisma": "^5.7.1"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }
