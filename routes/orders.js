@@ -11,13 +11,14 @@ const prisma = new PrismaClient()
 const createOrderSchema = Joi.object({
   // Customer details
   name: Joi.string().required().min(2).max(100),
-  customerInfo: Joi.object({
-    email: Joi.string().email().required(),
-    phone: Joi.string().optional().allow(""),
-    address: Joi.string().required().min(5),
-    city: Joi.string().required().min(2),
-    zipCode: Joi.string().required().min(3),
-  }).required(),
+customerInfo: Joi.object({
+  email: Joi.string().email().required(),
+  phone: Joi.string().optional().allow(""),
+  address: Joi.string().required().min(5),
+  city: Joi.string().required().min(2),
+  zipCode: Joi.string().optional().allow("").min(3),
+}).required(),
+
 
   // Pickup information
   pickupInfo: Joi.object({
@@ -94,7 +95,7 @@ router.post("/", async (req, res) => {
             phone: customerInfo.phone || null,
             address: customerInfo.address,
             city: customerInfo.city,
-            zipCode: customerInfo.zipCode,
+            zipCode: customerInfo.zipCode || null,
           },
         })
       } else {
