@@ -11,16 +11,27 @@ const app = express()
 const prisma = new PrismaClient()
 
 // --- CORRECTED CORS CONFIGURATION ---
-// This allows your FRONTEND_URL to be a comma-separated list
-const allowedOrigins = (process.env.FRONTEND_URL );
+const allowedOrigins = process.env.FRONTEND_URL?.split(",") || []
 
 app.use(
   cors({
-    origin: "*", // allow all origins
-  })
-);
-// --- END OF CORRECTION ---
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, Postman)
+      if (!origin) return callback(null, true)
 
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error("Not allowed by CORS"))
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+)
+// --- END OF CORS CONFIG ---
+
+// Middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
