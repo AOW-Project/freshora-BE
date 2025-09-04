@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
       include: {
         serviceItems: {
           where: { isActive: true },
-          orderBy: { name: "asc" },
+          orderBy: { sortOrder: "asc" },
         },
       },
       orderBy: { title: "asc" },
@@ -45,7 +45,7 @@ router.get("/:slug", async (req, res) => {
       include: {
         serviceItems: {
           where: { isActive: true },
-          orderBy: { name: "asc" },
+          orderBy: { sortOrder: "asc" },
         },
       },
     })
@@ -121,7 +121,7 @@ router.get("/:slug/items/:category", async (req, res) => {
         category: category,
         isActive: true,
       },
-      orderBy: { name: "asc" },
+      orderBy: { sortOrder: "asc" },
     })
 
     const formattedItems = items.map((item) => ({
