@@ -56,7 +56,7 @@ const servicesData = [
       ],
     },
   },
-  // 2. DRY CLEANING SERVICES
+  // 2. DRY CLEANING SERVICES (UPDATED)
   {
     slug: "dry-cleaning-services",
     title: "Dry Cleaning Services",
@@ -70,39 +70,57 @@ const servicesData = [
       men: [
         { id: "mdc1", name: "T-shirts/Shirts", price: 8, description: "Casual and formal shirts" },
         { id: "mdc2", name: "Trouser", price: 8, description: "Casual pants, formal trousers" },
-        { id: "mdc3", name: "Kandora", price: 12, description: "Traditional Kandora" },
-        { id: "mdc4", name: "Ghatra", price: 10, description: "Headwear" },
-        { id: "mdc5", name: "Lungi", price: 8, description: "Casual wear" },
         { id: "mdc6", name: "Shorts", price: 8, description: "Casual shorts" },
-        { id: "mdc7", name: "Cap/Tie", price: 7, description: "Caps and ties" },
+        { id: "mdc14", name: "Sweater", price: 14, description: "Delicate sweaters" },
         { id: "mdc8", name: "Jacket/Coat", price: 20, description: "Blazers, winter coats" },
         { id: "mdc9", name: "Waist Coat", price: 14, description: "Formal waistcoats" },
         { id: "mdc10", name: "Suit (2 pcs)", price: 25, description: "Two-piece business suits" },
         { id: "mdc11", name: "Suit (3 pcs)", price: 35, description: "Three-piece business suits" },
+        { id: "mdc3", name: "Kandora", price: 12, description: "Traditional Kandora" },
+        { id: "mdc4", name: "Ghatra", price: 10, description: "Headwear" },
+        { id: "mdc5", name: "Lungi", price: 8, description: "Casual wear" },
+        { id: "mdc7", name: "Cap/Tie", price: 7, description: "Caps and ties" },
         { id: "mdc12", name: "Inner Wear", price: 5, description: "Delicate undergarments" },
         { id: "mdc13", name: "Socks (Pair)", price: 3, description: "Pairs of socks" },
-        { id: "mdc14", name: "Sweater", price: 14, description: "Delicate sweaters" },
         { id: "mdc15", name: "Handkerchiefs", price: 3, description: "Handkerchiefs" },
       ],
       women: [
         { id: "wdc1", name: "T-shirts/Shirts", price: 8, description: "Casual tops, blouses" },
         { id: "wdc2", name: "Trouser", price: 8, description: "Trousers, jeans, leggings" },
-        { id: "wdc3", name: "Abbaya", price: 14, description: "Traditional Abbaya" },
-        { id: "wdc4", name: "Scarf/Dupatta", price: 6, description: "Scarves and dupattas" },
         { id: "wdc5", name: "Skirt/Shorts", price: 8, description: "Skirts and shorts" },
-        { id: "wdc6", name: "Full Dress", price: 15, description: "Formal and cocktail dresses" },
-        { id: "wdc7", name: "Salwar Kameez", price: 12, description: "Traditional attire" },
         { id: "wdc8", name: "Blouse", price: 10, description: "Silk and delicate blouses" },
-        { id: "wdc9", name: "Saree", price: 20, description: "Silk and formal Saree" },
+        { id: "wdc6", name: "Full Dress", price: 15, description: "Formal and cocktail dresses" },
+        { id: "wdc13", name: "Sweater", price: 14, description: "Delicate sweaters" },
         { id: "wdc10", name: "Coat/Jacket", price: 20, description: "Winter coats, blazers" },
         { id: "wdc11", name: "Suit (2 pcs)", price: 25, description: "Two-piece suits" },
         { id: "wdc12", name: "Suit (3 pcs)", price: 35, description: "Three-piece suits" },
-        { id: "wdc13", name: "Sweater", price: 14, description: "Delicate sweaters" },
+        { id: "wdc3", name: "Abbaya", price: 14, description: "Traditional Abbaya" },
+        { id: "wdc9", name: "Saree", price: 20, description: "Silk and formal Saree" },
+        { id: "wdc7", name: "Salwar Kameez", price: 12, description: "Traditional attire" },
+        { id: "wdc4", name: "Scarf/Dupatta", price: 6, description: "Scarves and dupattas" },
         { id: "wdc14", name: "Inner Wear", price: 5, description: "Delicate undergarments" },
+      ],
+      household: [
+        { id: "h1", name: "Police Dress/Safari Dress", price: 14, description: "Uniform cleaning" },
+        { id: "h2", name: "Duvet Cover (Single/Double)", price: 10, description: "Single/Double" },
+        { id: "h3", name: "Blanket (Single/Double)", price: 22, description: "Single/Double" },
+        { id: "h4", name: "Bed Spread (Single/Double)", price: 20, description: "Single/Double" },
+        { id: "h5", name: "Bed Sheet (Single/Double)", price: 10, description: "Single/Double" },
+        { id: "h6", name: "Pillow Case", price: 3, description: "" },
+        { id: "h7", name: "Cushion Cover", price: 4, description: "" },
+        { id: "h8", name: "Pillow/Cushion", price: 15, description: "" },
+        { id: "h9", name: "Bath Rope", price: 10, description: "" },
+        { id: "h10", name: "Bath Towel (M/L)", price: 4, description: "Medium/Large" },
+        { id: "h11", name: "Hand/Face Towel", price: 3, description: "" },
+        { id: "h12", name: "Bath Mat (M/L)", price: 3, description: "Medium/Large" },
+        { id: "h13", name: "Table Cloth/Table Napkins", price: 8, description: "Table Cloth/Napkins" },
+        { id: "h14", name: "Shoe", price: 40, description: "" },
+        { id: "h15", name: "Wedding Dress Normal", price: 50, description: "" },
+        { id: "h16", name: "Curtains (Per Sq meter)", price: 10, description: "Wash & Press" },
       ],
     },
   },
-  // 3. EXPRESS LAUNDRY (ADDED)
+  // 3. EXPRESS LAUNDRY
   {
     slug: "express-laundry-services",
     title: "Express Laundry Services",
@@ -118,13 +136,13 @@ const servicesData = [
       ]
     },
   },
-  // 4. SHOE & BAG SPA (SLUG CORRECTED)
+  // 4. SHOE & BAG SPA
   {
     slug: "shoe-bag-spa",
-    title: "Shoe & Bag Spa",
-    description: "Premium cleaning and restoration services for footwear and bags.",
+    title: "Shoe Cleaning",
+    description: "Premium cleaning and restoration services for footwears.",
     fullDescription:
-      "Our specialized shoe and bag spa restores your items to like-new condition. We handle everything from sports sneakers to luxury designer items.",
+      "Our specialized shoe and  restores your items to like-new condition. We handle everything from sports sneakers to luxury designer items.",
     rating: 4.9,
     reviews: 98,
     duration: "3-5 days",
@@ -152,7 +170,7 @@ const servicesData = [
       ]
     },
   },
-  // 5. LUXURY SHOE CLEANING (ADDED)
+  // 5. LUXURY SHOE CLEANING
   {
     slug: "luxury-shoe-cleaning",
     title: "Luxury Shoe Cleaning",
@@ -202,9 +220,9 @@ const servicesData = [
       ],
     },
   },
-  // 7. HOUSEHOLD (SLUG CORRECTED FOR CURTAINS)
+  // 7. HOUSEHOLD & CURTAIN CLEANING
   {
-    slug: "curtain-cleaning-service", // Frontend expects this for "Curtain Cleaning"
+    slug: "curtain-cleaning-service",
     title: "Household & Curtain Cleaning",
     description: "Professional cleaning for all your household items, including curtains.",
     fullDescription:
