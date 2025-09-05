@@ -18,10 +18,7 @@ router.get("/", async (req, res) => {
       orderBy: { title: "asc" },
     })
 
-    res.json({
-      success: true,
-      data: services,
-    })
+    res.json({ success: true, data: services })
   } catch (error) {
     console.error("Error fetching services:", error)
     res.status(500).json({
@@ -37,11 +34,8 @@ router.get("/:slug", async (req, res) => {
   try {
     const { slug } = req.params
 
-    const service = await prisma.service.findUnique({
-      where: {
-        slug: slug,
-        isActive: true,
-      },
+    const service = await prisma.service.findFirst({
+      where: { slug, isActive: true },
       include: {
         serviceItems: {
           where: { isActive: true },
@@ -57,11 +51,9 @@ router.get("/:slug", async (req, res) => {
       })
     }
 
-    // Group service items by category for frontend compatibility
+    // Group service items by category
     const groupedItems = service.serviceItems.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = []
-      }
+      if (!acc[item.category]) acc[item.category] = []
       acc[item.category].push({
         id: item.itemId,
         name: item.name,
@@ -85,10 +77,7 @@ router.get("/:slug", async (req, res) => {
       items: groupedItems,
     }
 
-    res.json({
-      success: true,
-      data: response,
-    })
+    res.json({ success: true, data: response })
   } catch (error) {
     console.error("Error fetching service:", error)
     res.status(500).json({
@@ -104,8 +93,8 @@ router.get("/:slug/items/:category", async (req, res) => {
   try {
     const { slug, category } = req.params
 
-    const service = await prisma.service.findUnique({
-      where: { slug: slug, isActive: true },
+    const service = await prisma.service.findFirst({
+      where: { slug, isActive: true },
     })
 
     if (!service) {
@@ -118,7 +107,7 @@ router.get("/:slug/items/:category", async (req, res) => {
     const items = await prisma.serviceItem.findMany({
       where: {
         serviceId: service.id,
-        category: category,
+        category,
         isActive: true,
       },
       orderBy: { sortOrder: "asc" },
@@ -133,10 +122,7 @@ router.get("/:slug/items/:category", async (req, res) => {
       image: item.image,
     }))
 
-    res.json({
-      success: true,
-      data: formattedItems,
-    })
+    res.json({ success: true, data: formattedItems })
   } catch (error) {
     console.error("Error fetching service items:", error)
     res.status(500).json({
