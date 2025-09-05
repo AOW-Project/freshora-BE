@@ -99,7 +99,7 @@ model ServiceItem {
   unit        String?
   image       String?
   category    String
-  sortOrder   Int      @default(0)        // ✅ now Prisma knows this field
+  sortOrder   Int      @default(0)   // <- important: integer used for ordering
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
