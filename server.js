@@ -17,7 +17,10 @@ const prisma = new PrismaClient();
 // --- CORS CONFIGURATION ---
 // This configuration allows you to specify allowed frontend URLs in your .env file
 // Example: FRONTEND_URL=http://localhost:3000,https://your-production-site.com
-const allowedOrigins = process.env.FRONTEND_URL?.split(",") || [];
+const allowedOrigins = (process.env.FRONTEND_URL || "").split(",").concat([
+  "http://localhost:3000" // ✅ ADD THIS LINE FOR LOCAL DEVELOPMENT
+]);
+
 
 app.use(
   cors({

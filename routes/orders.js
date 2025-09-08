@@ -1,6 +1,6 @@
 import express from "express";
 import Joi from "joi";
-import { prisma } from "../lib/prisma.js"; // Use the shared prisma instance
+import { prisma } from "../lib/prisma.js";
 import * as emailService from "../services/emailService.js";
 
 const router = express.Router();
@@ -65,33 +65,17 @@ router.post("/", async (req, res) => {
     const { name, customerInfo, pickupInfo, deliveryInfo, cartItems, totalAmount } = value;
     const orderNumber = generateOrderNumber();
 
-    // Use a Prisma transaction to ensure all database operations succeed or fail together
     const result = await prisma.$transaction(async (tx) => {
-      // Step 1: Use `upsert` to efficiently find or create a customer record.
       const customer = await tx.customer.upsert({
         where: { email: customerInfo.email },
-        update: {
-          name,
-          phone: customerInfo.phone,
-          address: customerInfo.address,
-          city: customerInfo.city,
-          zipCode: customerInfo.zipCode,
-        },
-        create: {
-          name,
-          email: customerInfo.email,
-          phone: customerInfo.phone,
-          address: customerInfo.address,
-          city: customerInfo.city,
-          zipCode: customerInfo.zipCode,
-        },
+        update: { name, phone: customerInfo.phone, address: customerInfo.address, city: customerInfo.city, zipCode: customerInfo.zipCode },
+        create: { name, email: customerInfo.email, phone: customerInfo.phone, address: customerInfo.address, city: customerInfo.city, zipCode: customerInfo.zipCode },
       });
 
-      // Step 2: Create the order and link it to the customer via `customerId`.
       const order = await tx.order.create({
         data: {
           orderNumber,
-          customerId: customer.id, // This creates the relation
+          customerId: customer.id,
           pickupDate: new Date(pickupInfo.date),
           deliveryDate: deliveryInfo?.date ? new Date(deliveryInfo.date) : null,
           service: cartItems[0]?.serviceSlug || "laundry-services",
@@ -101,9 +85,12 @@ router.post("/", async (req, res) => {
         },
       });
 
-      // Step 3: Use `createMany` to add all order items in a single, efficient query.
-      await tx.orderItem.createMany({
-        data: cartItems.map((item) => ({
+      // ✅ CORRECTED LOGIC FOR ORDER ITEMS
+      const orderItemsData = cartItems.map(item => {
+        // The item ID from the frontend is composite, e.g., "serviceId-serviceItemId"
+        const [serviceId, serviceItemId] = item.id.split('-');
+        
+        return {
           orderId: order.id,
           itemId: item.id,
           itemName: item.name,
@@ -112,10 +99,15 @@ router.post("/", async (req, res) => {
           price: item.price,
           quantity: item.quantity,
           subtotal: item.price * item.quantity,
-        })),
+          serviceId: serviceId, // <-- ADDED THIS
+          serviceItemId: serviceItemId, // <-- ADDED THIS
+        };
       });
 
-      // Step 4: Create the initial status history entry.
+      await tx.orderItem.createMany({
+        data: orderItemsData,
+      });
+
       await tx.orderStatusHistory.create({
         data: {
           orderId: order.id,
@@ -127,7 +119,6 @@ router.post("/", async (req, res) => {
       return { order, customer };
     });
 
-    // Step 5: Send confirmation email after the database transaction is successful.
     try {
       await emailService.sendOrderConfirmation({
         customerEmail: result.customer.email,
@@ -139,7 +130,7 @@ router.post("/", async (req, res) => {
       console.error("Failed to send confirmation email:", emailError);
     }
 
-    res.status(21).json({
+    res.status(201).json({
       success: true,
       message: "Order created successfully!",
       data: {
@@ -152,131 +143,131 @@ router.post("/", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "An unexpected error occurred while creating the order.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
 
-// GET /api/orders/:orderNumber - Get a single order by its number
+// ... (GET, PUT, and other routes remain the same)
 router.get("/:orderNumber", async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-    const order = await prisma.order.findUnique({
-      where: { orderNumber },
-      include: {
-        customer: true, // Include the full related customer object
-        items: true,
-        statusHistory: {
-          orderBy: { createdAt: "desc" },
-        },
-      },
-    });
+  try {
+    const { orderNumber } = req.params;
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: {
+        customer: true, // Include the full related customer object
+        items: true,
+        statusHistory: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
 
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found." });
-    }
-    res.json({ success: true, data: order });
-  } catch (error) {
-    console.error("Error fetching order:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch order." });
-  }
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found." });
+    }
+    res.json({ success: true, data: order });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch order." });
+  }
 });
 
 // PUT /api/orders/:orderNumber/status - Update an order's status
 router.put("/:orderNumber/status", async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-    const { status, notes } = req.body;
+  try {
+    const { orderNumber } = req.params;
+    const { status, notes } = req.body;
 
-    const validStatuses = ["PENDING", "CONFIRMED", "PICKED_UP", "IN_PROGRESS", "READY", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status provided." });
-    }
+    const validStatuses = ["PENDING", "CONFIRMED", "PICKED_UP", "IN_PROGRESS", "READY", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status provided." });
+    }
 
-    const updatedOrder = await prisma.$transaction(async (tx) => {
-      const order = await tx.order.update({
-        where: { orderNumber },
-        data: { status },
-        include: { customer: true },
-      });
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { orderNumber },
+        data: { status },
+        include: { customer: true },
+      });
 
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: order.id,
-          status,
-          notes,
-        },
-      });
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: order.id,
+          status,
+          notes,
+        },
+      });
 
-      return order;
-    });
+      return order;
+    });
 
-    try {
-      await emailService.sendStatusUpdate({
-        customerEmail: updatedOrder.customer.email,
-        customerName: updatedOrder.customer.name,
-        orderNumber,
-        newStatus: status,
-        notes,
-      });
-    } catch (emailError) {
-      console.error("Failed to send status update email:", emailError);
-    }
+    try {
+      await emailService.sendStatusUpdate({
+        customerEmail: updatedOrder.customer.email,
+        customerName: updatedOrder.customer.name,
+        orderNumber,
+        newStatus: status,
+        notes,
+      });
+    } catch (emailError) {
+      console.error("Failed to send status update email:", emailError);
+    }
 
-    res.json({ success: true, message: "Order status updated successfully.", data: updatedOrder });
-  } catch (error) {
-    console.error("Error updating order status:", error);
-    res.status(500).json({ success: false, message: "Failed to update order status." });
-  }
+    res.json({ success: true, message: "Order status updated successfully.", data: updatedOrder });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ success: false, message: "Failed to update order status." });
+  }
 });
 
 // GET /api/orders - Get all orders (for admin dashboard)
 router.get("/", async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status, search } = req.query;
-    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+  try {
+    const { page = 1, limit = 10, status, search } = req.query;
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
-    const where = {};
-    if (status) where.status = status;
-    if (search) {
-      where.OR = [
-        { orderNumber: { contains: search, mode: "insensitive" } },
-        { customer: { name: { contains: search, mode: "insensitive" } } },
-        { customer: { email: { contains: search, mode: "insensitive" } } },
-      ];
-    }
+    const where = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search, mode: "insensitive" } },
+        { customer: { name: { contains: search, mode: "insensitive" } } },
+        { customer: { email: { contains: search, mode: "insensitive" } } },
+      ];
+    }
 
-    const [orders, total] = await prisma.$transaction([
-      prisma.order.findMany({
-        where,
-        include: {
-          customer: {
-            select: { name: true, email: true, phone: true },
-          },
-          items: true,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: parseInt(limit, 10),
-      }),
-      prisma.order.count({ where }),
-    ]);
+    const [orders, total] = await prisma.$transaction([
+      prisma.order.findMany({
+        where,
+        include: {
+          customer: {
+            select: { name: true, email: true, phone: true },
+          },
+          items: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: parseInt(limit, 10),
+      }),
+      prisma.order.count({ where }),
+    ]);
 
-    res.json({
-      success: true,
-      data: {
-        orders,
-        pagination: {
-          page: parseInt(page, 10),
-          limit: parseInt(limit, 10),
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch orders." });
-  }
+    res.json({
+      success: true,
+      data: {
+        orders,
+        pagination: {
+          page: parseInt(page, 10),
+          limit: parseInt(limit, 10),
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch orders." });
+  }
 });
-
 export default router;
