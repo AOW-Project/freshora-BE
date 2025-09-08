@@ -16,13 +16,13 @@ const createOrderSchema = Joi.object({
     zipCode: Joi.string().optional().allow("").min(3),
   }).required(),
   pickupInfo: Joi.object({
-    date: Joi.date().iso().required(),
+    date: Joi.string().isoDate().required(), // Changed to accept ISO date strings
     time: Joi.string().required(),
     address: Joi.string().required().min(5),
     instructions: Joi.string().optional().allow(""),
   }).required(),
   deliveryInfo: Joi.object({
-    date: Joi.date().iso().optional(),
+    date: Joi.string().isoDate().optional(), // Changed to accept ISO date strings
     time: Joi.string().optional().allow(""),
     address: Joi.string().optional().allow(""),
   }).optional(),
@@ -53,8 +53,11 @@ function generateOrderNumber() {
 // POST /api/orders - Create a new order
 router.post("/", async (req, res) => {
   try {
+    console.log("[DEBUG] Received order request:", JSON.stringify(req.body, null, 2));
+
     const { error, value } = createOrderSchema.validate(req.body);
     if (error) {
+      console.error("[VALIDATION ERROR]:", error.details);
       return res.status(400).json({
         success: false,
         message: "Validation error",
@@ -65,13 +68,36 @@ router.post("/", async (req, res) => {
     const { name, customerInfo, pickupInfo, deliveryInfo, cartItems, totalAmount } = value;
     const orderNumber = generateOrderNumber();
 
+    console.log("[DEBUG] Validation passed, creating order...");
+    console.log("[DEBUG] Customer info:", customerInfo);
+    console.log("[DEBUG] Cart items:", cartItems);
+
     const result = await prisma.$transaction(async (tx) => {
+      console.log("[DEBUG] Starting transaction...");
+
+      // Create or update customer
       const customer = await tx.customer.upsert({
         where: { email: customerInfo.email },
-        update: { name, phone: customerInfo.phone, address: customerInfo.address, city: customerInfo.city, zipCode: customerInfo.zipCode },
-        create: { name, email: customerInfo.email, phone: customerInfo.phone, address: customerInfo.address, city: customerInfo.city, zipCode: customerInfo.zipCode },
+        update: { 
+          name, 
+          phone: customerInfo.phone || "", 
+          address: customerInfo.address, 
+          city: customerInfo.city, 
+          zipCode: customerInfo.zipCode || ""
+        },
+        create: { 
+          name, 
+          email: customerInfo.email, 
+          phone: customerInfo.phone || "", 
+          address: customerInfo.address, 
+          city: customerInfo.city, 
+          zipCode: customerInfo.zipCode || ""
+        },
       });
 
+      console.log("[DEBUG] Customer created/updated:", customer.id);
+
+      // Create order
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -79,16 +105,32 @@ router.post("/", async (req, res) => {
           pickupDate: new Date(pickupInfo.date),
           deliveryDate: deliveryInfo?.date ? new Date(deliveryInfo.date) : null,
           service: cartItems[0]?.serviceSlug || "laundry-services",
-          specialInstructions: pickupInfo.instructions,
+          specialInstructions: pickupInfo.instructions || "",
           totalAmount,
           status: "PENDING",
         },
       });
 
-      // ✅ CORRECTED LOGIC FOR ORDER ITEMS
-      const orderItemsData = cartItems.map(item => {
-        // The item ID from the frontend is composite, e.g., "serviceId-serviceItemId"
-        const [serviceId, serviceItemId] = item.id.split('-');
+      console.log("[DEBUG] Order created:", order.id);
+
+      // Create order items with better error handling
+      const orderItemsData = cartItems.map((item, index) => {
+        console.log(`[DEBUG] Processing cart item ${index}:`, item);
+        
+        // Handle different ID formats more robustly
+        let serviceId = "unknown";
+        let serviceItemId = "unknown";
+        
+        if (item.id && typeof item.id === 'string') {
+          const idParts = item.id.split('-');
+          if (idParts.length >= 2) {
+            serviceId = idParts[0];
+            serviceItemId = idParts.slice(1).join('-'); // Handle IDs with multiple dashes
+          } else {
+            serviceId = item.id;
+            serviceItemId = item.id;
+          }
+        }
         
         return {
           orderId: order.id,
@@ -96,18 +138,23 @@ router.post("/", async (req, res) => {
           itemName: item.name,
           category: item.category,
           serviceType: item.serviceSlug,
-          price: item.price,
-          quantity: item.quantity,
-          subtotal: item.price * item.quantity,
-          serviceId: serviceId, // <-- ADDED THIS
-          serviceItemId: serviceItemId, // <-- ADDED THIS
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+          subtotal: Number(item.price) * Number(item.quantity),
+          serviceId: serviceId,
+          serviceItemId: serviceItemId,
         };
       });
+
+      console.log("[DEBUG] Order items data:", orderItemsData);
 
       await tx.orderItem.createMany({
         data: orderItemsData,
       });
 
+      console.log("[DEBUG] Order items created");
+
+      // Create status history
       await tx.orderStatusHistory.create({
         data: {
           orderId: order.id,
@@ -116,9 +163,14 @@ router.post("/", async (req, res) => {
         },
       });
 
+      console.log("[DEBUG] Status history created");
+
       return { order, customer };
     });
 
+    console.log("[DEBUG] Transaction completed successfully");
+
+    // Send confirmation email (don't let email failures break the order)
     try {
       await emailService.sendOrderConfirmation({
         customerEmail: result.customer.email,
@@ -126,8 +178,10 @@ router.post("/", async (req, res) => {
         orderNumber,
         orderDetails: { ...value, customerInfo: result.customer },
       });
+      console.log("[DEBUG] Confirmation email sent");
     } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError);
+      console.error("[EMAIL ERROR] Failed to send confirmation email:", emailError);
+      // Don't throw - order was successful even if email failed
     }
 
     res.status(201).json({
@@ -139,135 +193,148 @@ router.post("/", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error("[CRITICAL ERROR] Error creating order:", error);
+    console.error("[ERROR STACK]:", error.stack);
+    
+    // Provide more detailed error info in development
+    const isDevelopment = process.env.NODE_ENV === "development";
+    
     res.status(500).json({
       success: false,
       message: "An unexpected error occurred while creating the order.",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      ...(isDevelopment && {
+        error: error.message,
+        stack: error.stack,
+        details: {
+          name: error.name,
+          code: error.code,
+        }
+      })
     });
   }
 });
 
-// ... (GET, PUT, and other routes remain the same)
+// GET /api/orders/:orderNumber - Get order by order number
 router.get("/:orderNumber", async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-    const order = await prisma.order.findUnique({
-      where: { orderNumber },
-      include: {
-        customer: true, // Include the full related customer object
-        items: true,
-        statusHistory: {
-          orderBy: { createdAt: "desc" },
-        },
-      },
-    });
+  try {
+    const { orderNumber } = req.params;
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: {
+        customer: true,
+        items: true,
+        statusHistory: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
 
-    if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found." });
-    }
-    res.json({ success: true, data: order });
-  } catch (error) {
-    console.error("Error fetching order:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch order." });
-  }
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found." });
+    }
+    res.json({ success: true, data: order });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch order." });
+  }
 });
 
 // PUT /api/orders/:orderNumber/status - Update an order's status
 router.put("/:orderNumber/status", async (req, res) => {
-  try {
-    const { orderNumber } = req.params;
-    const { status, notes } = req.body;
+  try {
+    const { orderNumber } = req.params;
+    const { status, notes } = req.body;
 
-    const validStatuses = ["PENDING", "CONFIRMED", "PICKED_UP", "IN_PROGRESS", "READY", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status provided." });
-    }
+    const validStatuses = ["PENDING", "CONFIRMED", "PICKED_UP", "IN_PROGRESS", "READY", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status provided." });
+    }
 
-    const updatedOrder = await prisma.$transaction(async (tx) => {
-      const order = await tx.order.update({
-        where: { orderNumber },
-        data: { status },
-        include: { customer: true },
-      });
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { orderNumber },
+        data: { status },
+        include: { customer: true },
+      });
 
-      await tx.orderStatusHistory.create({
-        data: {
-          orderId: order.id,
-          status,
-          notes,
-        },
-      });
+      await tx.orderStatusHistory.create({
+        data: {
+          orderId: order.id,
+          status,
+          notes,
+        },
+      });
 
-      return order;
-    });
+      return order;
+    });
 
-    try {
-      await emailService.sendStatusUpdate({
-        customerEmail: updatedOrder.customer.email,
-        customerName: updatedOrder.customer.name,
-        orderNumber,
-        newStatus: status,
-        notes,
-      });
-    } catch (emailError) {
-      console.error("Failed to send status update email:", emailError);
-    }
+    try {
+      await emailService.sendStatusUpdate({
+        customerEmail: updatedOrder.customer.email,
+        customerName: updatedOrder.customer.name,
+        orderNumber,
+        newStatus: status,
+        notes,
+      });
+    } catch (emailError) {
+      console.error("Failed to send status update email:", emailError);
+    }
 
-    res.json({ success: true, message: "Order status updated successfully.", data: updatedOrder });
-  } catch (error) {
-    console.error("Error updating order status:", error);
-    res.status(500).json({ success: false, message: "Failed to update order status." });
-  }
+    res.json({ success: true, message: "Order status updated successfully.", data: updatedOrder });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ success: false, message: "Failed to update order status." });
+  }
 });
 
 // GET /api/orders - Get all orders (for admin dashboard)
 router.get("/", async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status, search } = req.query;
-    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+  try {
+    const { page = 1, limit = 10, status, search } = req.query;
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
-    const where = {};
-    if (status) where.status = status;
-    if (search) {
-      where.OR = [
-        { orderNumber: { contains: search, mode: "insensitive" } },
-        { customer: { name: { contains: search, mode: "insensitive" } } },
-        { customer: { email: { contains: search, mode: "insensitive" } } },
-      ];
-    }
+    const where = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { orderNumber: { contains: search, mode: "insensitive" } },
+        { customer: { name: { contains: search, mode: "insensitive" } } },
+        { customer: { email: { contains: search, mode: "insensitive" } } },
+      ];
+    }
 
-    const [orders, total] = await prisma.$transaction([
-      prisma.order.findMany({
-        where,
-        include: {
-          customer: {
-            select: { name: true, email: true, phone: true },
-          },
-          items: true,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: parseInt(limit, 10),
-      }),
-      prisma.order.count({ where }),
-    ]);
+    const [orders, total] = await prisma.$transaction([
+      prisma.order.findMany({
+        where,
+        include: {
+          customer: {
+            select: { name: true, email: true, phone: true },
+          },
+          items: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: parseInt(limit, 10),
+      }),
+      prisma.order.count({ where }),
+    ]);
 
-    res.json({
-      success: true,
-      data: {
-        orders,
-        pagination: {
-          page: parseInt(page, 10),
-          limit: parseInt(limit, 10),
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch orders." });
-  }
+    res.json({
+      success: true,
+      data: {
+        orders,
+        pagination: {
+          page: parseInt(page, 10),
+          limit: parseInt(limit, 10),
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch orders." });
+  }
 });
+
 export default router;
