@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
       include: {
         serviceItems: {
           where: { isActive: true },
-          orderBy: { sortOrder: "asc" },
+          orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
         },
       },
       orderBy: { title: "asc" },
@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
           price: Number(item.price),
           unit: item.unit,
           image: item.image,
-          sortOrder: item.sortOrder,
+          sortOrder: item.sortOrder, // Added sortOrder back to the response
         });
         return acc;
       }, {});
@@ -67,7 +67,7 @@ router.get("/:slug", async (req, res) => {
       include: {
         serviceItems: {
           where: { isActive: true },
-          orderBy: { sortOrder: "asc" },
+          orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
         },
       },
     });
@@ -85,7 +85,7 @@ router.get("/:slug", async (req, res) => {
         price: Number(item.price),
         unit: item.unit,
         image: item.image,
-        sortOrder: item.sortOrder,
+        sortOrder: item.sortOrder, // Added sortOrder back to the response
       });
       return acc;
     }, {});
@@ -114,7 +114,7 @@ router.get("/:slug", async (req, res) => {
   }
 });
 
-// Get items by slug + category (sorted)
+// Get items by slug + category (sorted by sortOrder)
 router.get("/:slug/items/:category", async (req, res) => {
   try {
     const { slug, category } = req.params;
@@ -129,7 +129,7 @@ router.get("/:slug/items/:category", async (req, res) => {
 
     const items = await prisma.serviceItem.findMany({
       where: { serviceId: service.id, category, isActive: true },
-      orderBy: { sortOrder: "asc" },
+      orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
     });
 
     const formattedItems = items.map((item) => ({
@@ -139,7 +139,7 @@ router.get("/:slug/items/:category", async (req, res) => {
       price: Number(item.price),
       unit: item.unit,
       image: item.image,
-      sortOrder: item.sortOrder,
+      sortOrder: item.sortOrder, // Added sortOrder back to the response
     }));
 
     return res.json({ success: true, data: formattedItems });

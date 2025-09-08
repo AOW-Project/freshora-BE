@@ -329,7 +329,7 @@ async function seedServices() {
 
     // Create services
     for (const serviceData of servicesData) {
-      console.log(`📝 Creating service: ${serviceData.title}`);
+      console.log(`🔸 Creating service: ${serviceData.title}`);
 
       const service = await prisma.service.create({
         data: {
