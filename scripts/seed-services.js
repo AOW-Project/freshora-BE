@@ -1,11 +1,11 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// ================= FULL SERVICE DATA =================
 const servicesData = [
-  // 1. LAUNDRY SERVICES (WASH & PRESS)
-  {
+  // ... (all your servicesData array content remains exactly the same)
+    // 1. LAUNDRY SERVICES (WASH & PRESS)
+    {
     slug: "laundry-services",
     title: "Laundry Services (Wash & Press)",
     description: "Professional wash and press for all your clothing needs.",
@@ -318,60 +318,46 @@ const servicesData = [
   },
 ];
 
-// ================= SEED FUNCTION =================
-async function seedServices() {
-  try {
-    console.log("🌱 Starting services seeding...");
-
-    // Clear existing services and items
-    await prisma.serviceItem.deleteMany();
-    await prisma.service.deleteMany();
-
-    // Create services
-    for (const serviceData of servicesData) {
-      console.log(`🔸 Creating service: ${serviceData.title}`);
-
-      const service = await prisma.service.create({
-        data: {
-          slug: serviceData.slug,
-          title: serviceData.title,
-          description: serviceData.description,
-          fullDescription: serviceData.fullDescription,
-          rating: serviceData.rating,
-          reviews: serviceData.reviews,
-          duration: serviceData.duration,
-        },
-      });
-
-      // Create service items with preserved order
-      for (const [category, items] of Object.entries(serviceData.items)) {
-        console.log(`  📦 Adding ${items.length} items in category: ${category}`);
-        for (const [index, item] of items.entries()) {
-          await prisma.serviceItem.create({
-            data: {
-              serviceId: service.id,
-              itemId: item.id,
-              name: item.name,
-              description: item.description,
-              price: item.price,
-              unit: item.unit || null,
-              image: item.image || null,
-              category,
-              sortOrder: index, // 👈 ensures T-shirts always first
-            },
-          });
-        }
+async function main() {
+  console.log("Start seeding ...");
+  for (const s of servicesData) {
+    const service = await prisma.service.create({
+      data: {
+        slug: s.slug,
+        title: s.title,
+        description: s.description,
+        fullDescription: s.fullDescription,
+        rating: s.rating,
+        reviews: s.reviews,
+        duration: s.duration,
+      },
+    });
+    for (const [category, items] of Object.entries(s.items)) {
+      for (const [index, item] of items.entries()) {
+        await prisma.serviceItem.create({
+          data: {
+            serviceId: service.id,
+            itemId: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            unit: item.unit || null,
+            image: item.image || null,
+            category,
+            sortOrder: index,
+          },
+        });
       }
     }
-
-    console.log("✅ Services seeding completed!");
-  } catch (error) {
-    console.error("❌ Error seeding services:", error);
-    process.exit(1);
-  } finally {
-    await prisma.$disconnect();
   }
+  console.log("Seeding finished.");
 }
 
-// Run the script
-seedServices();
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
