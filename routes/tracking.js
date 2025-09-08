@@ -1,13 +1,13 @@
-const express = require("express")
-const { PrismaClient } = require("@prisma/client")
+import express from "express";
+import { PrismaClient } from "@prisma/client";
 
-const router = express.Router()
-const prisma = new PrismaClient()
+const router = express.Router();
+const prisma = new PrismaClient();
 
 // GET /api/tracking/:orderNumber - Track order by order number
 router.get("/:orderNumber", async (req, res) => {
   try {
-    const { orderNumber } = req.params
+    const { orderNumber } = req.params;
 
     const order = await prisma.order.findUnique({
       where: { orderNumber },
@@ -35,13 +35,13 @@ router.get("/:orderNumber", async (req, res) => {
           orderBy: { createdAt: "asc" },
         },
       },
-    })
+    });
 
     if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found. Please check your order number.",
-      })
+      });
     }
 
     // Calculate progress percentage based on status
@@ -54,7 +54,7 @@ router.get("/:orderNumber", async (req, res) => {
       OUT_FOR_DELIVERY: 90,
       DELIVERED: 100,
       CANCELLED: 0,
-    }
+    };
 
     const trackingInfo = {
       orderNumber: order.orderNumber,
@@ -73,31 +73,31 @@ router.get("/:orderNumber", async (req, res) => {
         notes: history.notes,
         timestamp: history.createdAt,
       })),
-    }
+    };
 
     res.json({
       success: true,
       data: trackingInfo,
-    })
+    });
   } catch (error) {
-    console.error("Error tracking order:", error)
+    console.error("Error tracking order:", error);
     res.status(500).json({
       success: false,
       message: "Failed to track order",
-    })
+    });
   }
-})
+});
 
 // GET /api/tracking - Track multiple orders by email
 router.get("/", async (req, res) => {
   try {
-    const { email } = req.query
+    const { email } = req.query;
 
     if (!email) {
       return res.status(400).json({
         success: false,
         message: "Email parameter is required",
-      })
+      });
     }
 
     const customer = await prisma.customer.findUnique({
@@ -120,13 +120,13 @@ router.get("/", async (req, res) => {
           orderBy: { createdAt: "desc" },
         },
       },
-    })
+    });
 
     if (!customer) {
       return res.status(404).json({
         success: false,
         message: "No orders found for this email address",
-      })
+      });
     }
 
     const ordersWithProgress = customer.orders.map((order) => {
@@ -139,7 +139,7 @@ router.get("/", async (req, res) => {
         OUT_FOR_DELIVERY: 90,
         DELIVERED: 100,
         CANCELLED: 0,
-      }
+      };
 
       return {
         orderNumber: order.orderNumber,
@@ -151,8 +151,8 @@ router.get("/", async (req, res) => {
         totalAmount: order.totalAmount,
         itemCount: order.orderItems.length,
         latestUpdate: order.statusHistory[0]?.createdAt || order.createdAt,
-      }
-    })
+      };
+    });
 
     res.json({
       success: true,
@@ -163,14 +163,14 @@ router.get("/", async (req, res) => {
         },
         orders: ordersWithProgress,
       },
-    })
+    });
   } catch (error) {
-    console.error("Error tracking orders:", error)
+    console.error("Error tracking orders:", error);
     res.status(500).json({
       success: false,
       message: "Failed to track orders",
-    })
+    });
   }
-})
+});
 
-module.exports = router
+export default router;

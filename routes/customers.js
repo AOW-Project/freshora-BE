@@ -1,13 +1,13 @@
-const express = require("express")
-const { PrismaClient } = require("@prisma/client")
+import express from "express";
+import { PrismaClient } from "@prisma/client";
 
-const router = express.Router()
-const prisma = new PrismaClient()
+const router = express.Router();
+const prisma = new PrismaClient();
 
 // GET /api/customers/:email/orders - Get customer orders by email
 router.get("/:email/orders", async (req, res) => {
   try {
-    const { email } = req.params
+    const { email } = req.params;
 
     const customer = await prisma.customer.findUnique({
       where: { email },
@@ -23,13 +23,13 @@ router.get("/:email/orders", async (req, res) => {
           orderBy: { createdAt: "desc" },
         },
       },
-    })
+    });
 
     if (!customer) {
       return res.status(404).json({
         success: false,
         message: "Customer not found",
-      })
+      });
     }
 
     res.json({
@@ -42,25 +42,25 @@ router.get("/:email/orders", async (req, res) => {
         },
         orders: customer.orders,
       },
-    })
+    });
   } catch (error) {
-    console.error("Error fetching customer orders:", error)
+    console.error("Error fetching customer orders:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch customer orders",
-    })
+    });
   }
-})
+});
 
 // GET /api/customers - Get all customers (admin)
 router.get("/", async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query
-    const skip = (page - 1) * limit
+    const { page = 1, limit = 10, search } = req.query;
+    const skip = (page - 1) * limit;
 
-    const where = {}
+    const where = {};
     if (search) {
-      where.OR = [{ name: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }]
+      where.OR = [{ name: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }];
     }
 
     const [customers, total] = await Promise.all([
@@ -76,7 +76,7 @@ router.get("/", async (req, res) => {
         take: Number.parseInt(limit),
       }),
       prisma.customer.count({ where }),
-    ])
+    ]);
 
     res.json({
       success: true,
@@ -89,14 +89,14 @@ router.get("/", async (req, res) => {
           pages: Math.ceil(total / limit),
         },
       },
-    })
+    });
   } catch (error) {
-    console.error("Error fetching customers:", error)
+    console.error("Error fetching customers:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch customers",
-    })
+    });
   }
-})
+});
 
-module.exports = router
+export default router;

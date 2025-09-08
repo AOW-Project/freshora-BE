@@ -1,156 +1,196 @@
-const express = require("express");
-const { PrismaClient } = require("@prisma/client");
+import express from "express";
+import { body, param, validationResult } from "express-validator";
+import { prisma } from "../lib/prisma.js";
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
-// Get all services (grouped items, sorted by sortOrder)
+// Helper function to transform service data to group items by category
+const transformService = (service) => {
+  if (!service) return null;
+
+  const itemsByCategory = service.items.reduce((acc, item) => {
+    if (!acc[item.category]) {
+      acc[item.category] = [];
+    }
+    acc[item.category].push({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      description: item.description || "",
+      unit: item.unit || "Per Item",
+      image: item.image,
+    });
+    return acc;
+  }, {});
+
+  return {
+    ...service,
+    items: itemsByCategory,
+  };
+};
+
+// Middleware to handle validation errors cleanly
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, errors: errors.array() });
+  }
+  next();
+};
+
+// GET /api/services - Get all services
 router.get("/", async (req, res) => {
   try {
     const services = await prisma.service.findMany({
-      where: { isActive: true },
-      include: {
-        serviceItems: {
-          where: { isActive: true },
-          orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
-        },
-      },
-      orderBy: { title: "asc" },
+      include: { items: true },
     });
-
-    const formattedServices = services.map((service) => {
-      const groupedItems = service.serviceItems.reduce((acc, item) => {
-        if (!acc[item.category]) acc[item.category] = [];
-        acc[item.category].push({
-          id: item.itemId,
-          name: item.name,
-          description: item.description,
-          price: Number(item.price),
-          unit: item.unit,
-          image: item.image,
-          sortOrder: item.sortOrder, // Added sortOrder back to the response
-        });
-        return acc;
-      }, {});
-
-      return {
-        id: service.id,
-        slug: service.slug,
-        title: service.title,
-        description: service.description,
-        fullDescription: service.fullDescription,
-        rating: service.rating,
-        reviews: service.reviews,
-        duration: service.duration,
-        items: groupedItems,
-      };
-    });
-
-    return res.json({ success: true, data: formattedServices });
+    const transformedServices = services.map(transformService);
+    res.json({ success: true, data: transformedServices });
   } catch (error) {
     console.error("Error fetching services:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch services",
-      error: error.message,
-    });
+    res.status(500).json({ success: false, error: "Failed to fetch services" });
   }
 });
 
-// Get service by slug
-router.get("/:slug", async (req, res) => {
-  try {
-    const { slug } = req.params;
-
-    const service = await prisma.service.findFirst({
-      where: { slug, isActive: true },
-      include: {
-        serviceItems: {
-          where: { isActive: true },
-          orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
-        },
-      },
-    });
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: "Service not found" });
-    }
-
-    const groupedItems = service.serviceItems.reduce((acc, item) => {
-      if (!acc[item.category]) acc[item.category] = [];
-      acc[item.category].push({
-        id: item.itemId,
-        name: item.name,
-        description: item.description,
-        price: Number(item.price),
-        unit: item.unit,
-        image: item.image,
-        sortOrder: item.sortOrder, // Added sortOrder back to the response
+// GET /api/services/:slug - Get a single service by its slug
+router.get(
+  "/:slug",
+  [param("slug").notEmpty().withMessage("Slug is required")],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const service = await prisma.service.findUnique({
+        where: { slug },
+        include: { items: true },
       });
-      return acc;
-    }, {});
 
-    return res.json({
-      success: true,
-      data: {
-        id: service.id,
-        slug: service.slug,
-        title: service.title,
-        description: service.description,
-        fullDescription: service.fullDescription,
-        rating: service.rating,
-        reviews: service.reviews,
-        duration: service.duration,
-        items: groupedItems,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching service:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch service",
-      error: error.message,
-    });
-  }
-});
-
-// Get items by slug + category (sorted by sortOrder)
-router.get("/:slug/items/:category", async (req, res) => {
-  try {
-    const { slug, category } = req.params;
-
-    const service = await prisma.service.findFirst({
-      where: { slug, isActive: true },
-    });
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: "Service not found" });
+      if (!service) {
+        return res.status(404).json({ success: false, error: "Service not found" });
+      }
+      const transformedService = transformService(service);
+      res.json({ success: true, data: transformedService });
+    } catch (error) {
+      console.error("Error fetching service:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch service" });
     }
-
-    const items = await prisma.serviceItem.findMany({
-      where: { serviceId: service.id, category, isActive: true },
-      orderBy: { sortOrder: "asc" }, // Changed back to sortOrder
-    });
-
-    const formattedItems = items.map((item) => ({
-      id: item.itemId,
-      name: item.name,
-      description: item.description,
-      price: Number(item.price),
-      unit: item.unit,
-      image: item.image,
-      sortOrder: item.sortOrder, // Added sortOrder back to the response
-    }));
-
-    return res.json({ success: true, data: formattedItems });
-  } catch (error) {
-    console.error("Error fetching service items:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch service items",
-      error: error.message,
-    });
   }
-});
+);
 
-module.exports = router;
+// POST /api/services - Create a new service
+router.post(
+  "/",
+  [
+    body("title").notEmpty().withMessage("Title is required"),
+    body("description").notEmpty().withMessage("Description is required"),
+    body("slug").notEmpty().withMessage("Slug is required"),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { slug, title, description } = req.body;
+      const existingService = await prisma.service.findUnique({ where: { slug } });
+
+      if (existingService) {
+        return res.status(409).json({ success: false, error: "A service with this slug already exists" });
+      }
+
+      const newService = await prisma.service.create({
+        data: {
+          slug,
+          title,
+          description,
+          fullDescription: req.body.fullDescription || description,
+        },
+      });
+      res.status(201).json({ success: true, data: newService, message: "Service created successfully" });
+    } catch (error) {
+      console.error("Error creating service:", error);
+      res.status(500).json({ success: false, error: "Failed to create service" });
+    }
+  }
+);
+
+// PUT /api/services/:slug - Update an existing service
+router.put(
+  "/:slug",
+  [param("slug").notEmpty().withMessage("Slug is required")],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const updatedService = await prisma.service.update({
+        where: { slug },
+        data: req.body,
+      });
+      res.json({ success: true, data: updatedService, message: "Service updated successfully" });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        return res.status(404).json({ success: false, error: "Service not found" });
+      }
+      console.error("Error updating service:", error);
+      res.status(500).json({ success: false, error: "Failed to update service" });
+    }
+  }
+);
+
+// DELETE /api/services/:slug - Delete a service
+router.delete(
+  "/:slug",
+  [param("slug").notEmpty().withMessage("Slug is required")],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { slug } = req.params;
+      await prisma.service.delete({ where: { slug } });
+      res.json({ success: true, message: "Service deleted successfully" });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        return res.status(404).json({ success: false, error: "Service not found" });
+      }
+      console.error("Error deleting service:", error);
+      res.status(500).json({ success: false, error: "Failed to delete service" });
+    }
+  }
+);
+
+// POST /api/services/:slug/items - Add an item to a service
+router.post(
+  "/:slug/items",
+  [
+    param("slug").notEmpty().withMessage("Slug is required"),
+    body("name").notEmpty().withMessage("Item name is required"),
+    body("category").notEmpty().withMessage("Category is required"),
+    body("price").isNumeric().withMessage("Price must be a number").toFloat(),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const service = await prisma.service.findUnique({ where: { slug } });
+
+      if (!service) {
+        return res.status(404).json({ success: false, error: "Service not found" });
+      }
+
+      const { name, category, price, description, unit, image } = req.body;
+      const newItem = await prisma.serviceItem.create({
+        data: {
+          serviceId: service.id,
+          name,
+          category,
+          price,
+          description,
+          unit,
+          image,
+        },
+      });
+      res.status(201).json({ success: true, data: newItem, message: "Item added successfully" });
+    } catch (error) {
+      console.error("Error adding item:", error);
+      res.status(500).json({ success: false, error: "Failed to add item" });
+    }
+  }
+);
+
+export default router;
