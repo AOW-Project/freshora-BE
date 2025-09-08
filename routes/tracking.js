@@ -1,8 +1,7 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma.js"; // Use the shared Prisma instance
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // GET /api/tracking/:orderNumber - Track order by order number
 router.get("/:orderNumber", async (req, res) => {
@@ -22,7 +21,7 @@ router.get("/:orderNumber", async (req, res) => {
             zipCode: true,
           },
         },
-        orderItems: {
+        items: { // Corrected relation name
           select: {
             itemName: true,
             category: true,
@@ -44,7 +43,6 @@ router.get("/:orderNumber", async (req, res) => {
       });
     }
 
-    // Calculate progress percentage based on status
     const statusProgress = {
       PENDING: 10,
       CONFIRMED: 20,
@@ -67,7 +65,7 @@ router.get("/:orderNumber", async (req, res) => {
       totalAmount: order.totalAmount,
       specialInstructions: order.specialInstructions,
       customer: order.customer,
-      items: order.orderItems,
+      items: order.items,
       statusHistory: order.statusHistory.map((history) => ({
         status: history.status,
         notes: history.notes,
@@ -105,7 +103,7 @@ router.get("/", async (req, res) => {
       include: {
         orders: {
           include: {
-            orderItems: {
+            items: { // Corrected relation name
               select: {
                 itemName: true,
                 quantity: true,
@@ -149,7 +147,7 @@ router.get("/", async (req, res) => {
         pickupDate: order.pickupDate,
         deliveryDate: order.deliveryDate,
         totalAmount: order.totalAmount,
-        itemCount: order.orderItems.length,
+        itemCount: order.items.length,
         latestUpdate: order.statusHistory[0]?.createdAt || order.createdAt,
       };
     });

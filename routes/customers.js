@@ -1,8 +1,7 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma.js"; // Use the shared Prisma instance
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // GET /api/customers/:email/orders - Get customer orders by email
 router.get("/:email/orders", async (req, res) => {
@@ -14,7 +13,7 @@ router.get("/:email/orders", async (req, res) => {
       include: {
         orders: {
           include: {
-            orderItems: true,
+            items: true,
             statusHistory: {
               orderBy: { createdAt: "desc" },
               take: 1,
@@ -56,11 +55,15 @@ router.get("/:email/orders", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const where = {};
     if (search) {
-      where.OR = [{ name: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }];
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+        { phone: { contains: search, mode: "insensitive" } },
+      ];
     }
 
     const [customers, total] = await Promise.all([
@@ -72,8 +75,8 @@ router.get("/", async (req, res) => {
           },
         },
         orderBy: { createdAt: "desc" },
-        skip: Number.parseInt(skip),
-        take: Number.parseInt(limit),
+        skip,
+        take: parseInt(limit),
       }),
       prisma.customer.count({ where }),
     ]);
@@ -83,8 +86,8 @@ router.get("/", async (req, res) => {
       data: {
         customers,
         pagination: {
-          page: Number.parseInt(page),
-          limit: Number.parseInt(limit),
+          page: parseInt(page),
+          limit: parseInt(limit),
           total,
           pages: Math.ceil(total / limit),
         },
