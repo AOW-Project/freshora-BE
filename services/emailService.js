@@ -12,14 +12,33 @@ class EmailService {
     });
   }
 
-  async sendOrderConfirmation({ customerEmail, customerName, orderNumber, orderDetails }) {
+  async sendOrderConfirmation({
+    customerEmail,
+    customerName,
+    orderNumber,
+    orderDetails,
+  }) {
     // ... (rest of the method is unchanged)
-    const { service, pickupDate, deliveryDate, totalAmount, items, specialInstructions, customerInfo } = orderDetails;
+    // console.log("[CUSTOMER-EMAIL]", customerEmail);
+    // console.log("[CUSTOMER-NAME]", customerName);
+    // console.log("[ORDER-NUMBER]", orderNumber);
+    // console.log("[ORDER-DETAILS]", orderDetails);
+    const {
+      name,
+      customerInfo,
+      pickupInfo,
+      deliveryInfo,
+      cartItems,
+      totalAmount,
+      paymentMethod,
+    } = orderDetails;
 
-    const itemsList = items
+    const itemsList = await cartItems
       .map(
         (item) =>
-          `• ${item.name} (${item.category}) - Qty: ${item.quantity} - AED${(item.price * item.quantity).toFixed(2)}`
+          `• ${item.name} (${item.category}) - Qty: ${item.quantity} - AED${(
+            item.price * item.quantity
+          ).toFixed(2)}`
       )
       .join("\n");
 
@@ -27,35 +46,57 @@ class EmailService {
       from: process.env.EMAIL_FROM,
       to: customerEmail,
       subject: `🧺 Order Confirmation - ${orderNumber} | Your Laundry is in Good Hands!`,
-      html: this.generateCustomerBrochureHTML(customerName, orderNumber, orderDetails),
+      html: this.generateCustomerBrochureHTML(
+        customerName,
+        orderNumber,
+        orderDetails
+      ),
     };
 
     const businessMailOptions = {
       from: process.env.EMAIL_FROM,
       to: process.env.EMAIL_FROM, // Business email
       subject: `📋 New Order Received - ${orderNumber}`,
-      html: this.generateBusinessNotificationHTML(customerName, orderNumber, orderDetails),
+      html: this.generateBusinessNotificationHTML(
+        customerName,
+        orderNumber,
+        orderDetails
+      ),
     };
 
     try {
-      await Promise.all([this.transporter.sendMail(customerMailOptions), this.transporter.sendMail(businessMailOptions)]);
-      console.log(`✅ Order confirmation emails sent to customer (${customerEmail}) and business`);
+      await Promise.all([
+        this.transporter.sendMail(customerMailOptions),
+        this.transporter.sendMail(businessMailOptions),
+      ]);
+      console.log(
+        `✅ Order confirmation emails sent to customer (${customerEmail}) and business`
+      );
     } catch (error) {
       console.error("❌ Failed to send order confirmation emails:", error);
       throw error;
     }
   }
 
-  async sendStatusUpdate({ customerEmail, customerName, orderNumber, newStatus, notes }) {
+  async sendStatusUpdate({
+    customerEmail,
+    customerName,
+    orderNumber,
+    newStatus,
+    notes,
+  }) {
     // ... (rest of the method is unchanged)
     const statusMessages = {
       CONFIRMED: "Your order has been confirmed and is being prepared.",
-      PICKED_UP: "Your items have been picked up and are on their way to our facility.",
+      PICKED_UP:
+        "Your items have been picked up and are on their way to our facility.",
       IN_PROGRESS: "Your items are currently being processed.",
       READY: "Great news! Your order is ready for delivery.",
       OUT_FOR_DELIVERY: "Your order is out for delivery and will arrive soon.",
-      DELIVERED: "Your order has been successfully delivered. Thank you for choosing our service!",
-      CANCELLED: "Your order has been cancelled. If you have any questions, please contact us.",
+      DELIVERED:
+        "Your order has been successfully delivered. Thank you for choosing our service!",
+      CANCELLED:
+        "Your order has been cancelled. If you have any questions, please contact us.",
     };
 
     const emailContent = `
@@ -94,15 +135,29 @@ The Laundry Service Team
 
   generateCustomerBrochureHTML(customerName, orderNumber, orderDetails) {
     // ... (this entire HTML template function is unchanged)
-    const { service, pickupDate, deliveryDate, totalAmount, items, specialInstructions, customerInfo } = orderDetails;
+    const {
+      name,
+      customerInfo,
+      pickupInfo,
+      deliveryInfo,
+      cartItems,
+      totalAmount,
+      paymentMethod,
+    } = orderDetails;
 
-    const itemsHTML = items
+    const itemsHTML = cartItems
       .map(
         (item) => `
       <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${item.name}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">${item.category}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${item.quantity}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${
+          item.name
+        }</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">${
+          item.category
+        }</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${
+          item.quantity
+        }</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #16a34a;">AED${(
           item.price * item.quantity
         ).toFixed(2)}</td>
@@ -145,7 +200,7 @@ The Laundry Service Team
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
                         <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Service Type</p>
-                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${service
+                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${orderDetails.cartItems[0].serviceSlug
                           .replace("-", " ")
                           .toUpperCase()}</p>
                     </div>
@@ -157,18 +212,22 @@ The Laundry Service Team
                     </div>
                     <div>
                         <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Pickup Date</p>
-                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${new Date(pickupDate).toLocaleDateString(
-                          "en-US",
-                          { weekday: "long", year: "numeric", month: "long", day: "numeric" }
-                        )}</p>
+                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${new Date(
+                          orderDetails.pickupInfo.date
+                        ).toLocaleDateString("en-US", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}</p>
                     </div>
                     ${
-                      deliveryDate
+                      orderDetails.deliveryInfo.date
                         ? `
                     <div>
                         <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Delivery Date</p>
                         <p style="margin: 0; color: #1e293b; font-weight: 600;">${new Date(
-                          deliveryDate
+                          orderDetails.deliveryInfo.date
                         ).toLocaleDateString("en-US", {
                           weekday: "long",
                           year: "numeric",
@@ -204,7 +263,7 @@ The Laundry Service Team
             </div>
             
             ${
-              specialInstructions
+              orderDetails.pickupInfo.instructions
                 ? `
             <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
                 <h4 style="margin: 0 0 10px 0; color: #92400e; display: flex; align-items: center;">
@@ -249,7 +308,9 @@ The Laundry Service Team
             
             <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
                 <p style="margin: 0 0 10px 0; color: #6b7280;">Questions? We're here to help!</p>
-                <p style="margin: 0; color: #16a34a; font-weight: 600;">📧 ${process.env.EMAIL_FROM}</p>
+                <p style="margin: 0; color: #16a34a; font-weight: 600;">📧 ${
+                  process.env.EMAIL_FROM
+                }</p>
             </div>
         </div>
         
@@ -264,16 +325,29 @@ The Laundry Service Team
   }
 
   generateBusinessNotificationHTML(customerName, orderNumber, orderDetails) {
-    // ... (this entire HTML template function is unchanged)
-    const { service, pickupDate, deliveryDate, totalAmount, items, specialInstructions, customerInfo } = orderDetails;
+    const {
+      name,
+      customerInfo,
+      pickupInfo,
+      deliveryInfo,
+      cartItems,
+      totalAmount,
+      paymentMethod,
+    } = orderDetails;
 
-    const itemsHTML = items
+    const itemsHTML = cartItems
       .map(
         (item) => `
       <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.category}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
+          item.name
+        }</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
+          item.category
+        }</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${
+          item.quantity
+        }</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${(
           item.price * item.quantity
         ).toFixed(2)}</td>
@@ -302,16 +376,42 @@ The Laundry Service Team
                 <p><strong>Name:</strong> ${customerName}</p>
                 <p><strong>Email:</strong> ${customerInfo?.email || "N/A"}</p>
                 <p><strong>Phone:</strong> ${customerInfo?.phone || "N/A"}</p>
-                <p><strong>Address:</strong> ${customerInfo?.address || "N/A"}</p>
-                ${customerInfo?.city ? `<p><strong>City:</strong> ${customerInfo.city}</p>` : ""}
-                ${customerInfo?.zipCode ? `<p><strong>Zip Code:</strong> ${customerInfo.zipCode}</p>` : ""}
+                <p><strong>Address:</strong> ${
+                  customerInfo?.address || "N/A"
+                }</p>
+                ${
+                  customerInfo?.city
+                    ? `<p><strong>City:</strong> ${customerInfo.city}</p>`
+                    : ""
+                }
+                ${
+                  customerInfo?.zipCode
+                    ? `<p><strong>Zip Code:</strong> ${customerInfo.zipCode}</p>`
+                    : ""
+                }
             </div>
             
             <h2>Order Details</h2>
             <div style="background: white; padding: 15px; margin: 10px 0; border-left: 4px solid #dc2626;">
-                <p><strong>Service:</strong> ${service}</p>
-                <p><strong>Pickup Date:</strong> ${new Date(pickupDate).toLocaleDateString()}</p>
-                ${deliveryDate ? `<p><strong>Delivery Date:</strong> ${new Date(deliveryDate).toLocaleDateString()}</p>` : ""}
+                <div style="display:flex; flex-direction:row; gap:20px ">
+                <p><strong>Pickup Date:</strong> ${new Date(
+                  orderDetails.pickupInfo.date
+                ).toLocaleDateString()}</p>
+                <p style="padding-left:20px"><strong>Pickup Time:</strong> ${
+                  orderDetails.pickupInfo.time
+                }</p>
+                </div>
+                
+
+                ${
+                  orderDetails.deliveryInfo.date
+                    ? `<div style="display:flex; flex-direction:row;gap:20px"><p ><strong>Delivery Date:</strong> ${new Date(
+                        orderDetails.deliveryInfo.date
+                      ).toLocaleDateString()}</p><p style="padding-left:20px" ><strong>Delivery Time:</strong> ${
+                        orderDetails.deliveryInfo.time
+                      }</p></div>`
+                    : ""
+                }
                 <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
             </div>
             
@@ -331,7 +431,7 @@ The Laundry Service Team
             </table>
             
             ${
-              specialInstructions
+              orderDetails.pickupInfo.instructions
                 ? `
             <div style="background: #fef3c7; padding: 15px; margin: 20px 0; border-radius: 5px;">
                 <h4 style="margin-top: 0;">Special Instructions:</h4>
@@ -354,15 +454,28 @@ The Laundry Service Team
 
   generateOrderConfirmationHTML(customerName, orderNumber, orderDetails) {
     // ... (this entire HTML template function is unchanged)
-    const { service, pickupDate, deliveryDate, totalAmount, items, specialInstructions } = orderDetails;
+    const {
+      service,
+      pickupDate,
+      deliveryDate,
+      totalAmount,
+      items,
+      specialInstructions,
+    } = orderDetails;
 
     const itemsHTML = items
       .map(
         (item) => `
       <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.category}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
+          item.name
+        }</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
+          item.category
+        }</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${
+          item.quantity
+        }</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">AED${(
           item.price * item.quantity
         ).toFixed(2)}</td>
@@ -393,9 +506,19 @@ The Laundry Service Team
                 <h3 style="margin-top: 0;">Order Details</h3>
                 <p><strong>Order Number:</strong> ${orderNumber}</p>
                 <p><strong>Service:</strong> ${service}</p>
-                <p><strong>Pickup Date:</strong> ${new Date(pickupDate).toLocaleDateString()}</p>
-                ${deliveryDate ? `<p><strong>Delivery Date:</strong> ${new Date(deliveryDate).toLocaleDateString()}</p>` : ""}
-                <p><strong>Total Amount:</strong> AED${totalAmount.toFixed(2)}</p>
+                <p><strong>Pickup Date:</strong> ${new Date(
+                  pickupDate
+                ).toLocaleDateString()}</p>
+                ${
+                  deliveryDate
+                    ? `<p><strong>Delivery Date:</strong> ${new Date(
+                        deliveryDate
+                      ).toLocaleDateString()}</p>`
+                    : ""
+                }
+                <p><strong>Total Amount:</strong> AED${totalAmount.toFixed(
+                  2
+                )}</p>
             </div>
             
             <h3>Items Ordered:</h3>
@@ -441,7 +564,9 @@ The Laundry Service Team
                 </a>
             </div>
             
-            <p>If you have any questions, please don't hesitate to contact us at ${process.env.EMAIL_FROM}</p>
+            <p>If you have any questions, please don't hesitate to contact us at ${
+              process.env.EMAIL_FROM
+            }</p>
             
             <p>Best regards,<br>The Laundry Service Team</p>
         </div>
