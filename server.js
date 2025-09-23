@@ -96,6 +96,7 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
+      console.log("Connected to", process.env.DATABASE_URL);
       console.log(`📍 API URL: http://localhost:${PORT}/api`);
       console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
     });
