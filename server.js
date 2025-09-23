@@ -20,34 +20,16 @@ const prisma = new PrismaClient();
 // Example: FRONTEND_URL=http://localhost:3000,https://your-production-site.com
 
 // for dev env
+
+// Allowed origins for CORS
 const allowedOrigins = ["https://freshoralaundry.com", "http://localhost:3000"];
 
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"));
-//       }
-//     },
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     credentials: true,
-//   })
-// );
-
-app.use(
-  cors({
-    origin: ["https://freshoralaundry.com"], // allow your frontend domain
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
+// --- MIDDLEWARE ---
+// CORS
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, Postman)
+      // Allow requests with no origin (Postman, curl, mobile apps)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -58,6 +40,7 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
