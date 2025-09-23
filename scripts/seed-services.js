@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-// ================= FULL SERVICE DATA =================
 const servicesData = [
   // ... (all your servicesData array content remains exactly the same)
   // 1. LAUNDRY SERVICES (WASH & PRESS)
@@ -1075,9 +1073,13 @@ const servicesData = [
 
 async function main() {
   console.log("Start seeding ...");
+
   for (const s of servicesData) {
-    const service = await prisma.service.create({
-      data: {
+    // Upsert service - create if doesn't exist, otherwise just return existing
+    const service = await prisma.service.upsert({
+      where: { slug: s.slug },
+      update: {}, // Don't update existing data
+      create: {
         slug: s.slug,
         title: s.title,
         description: s.description,
@@ -1087,24 +1089,40 @@ async function main() {
         duration: s.duration,
       },
     });
+    console.log(`Processed service: ${s.title}`);
+
     for (const [category, items] of Object.entries(s.items)) {
       for (const [index, item] of items.entries()) {
-        await prisma.serviceItem.create({
-          data: {
+        // Check if service item already exists
+        const existingItem = await prisma.serviceItem.findFirst({
+          where: {
             serviceId: service.id,
             itemId: item.id,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            unit: item.unit || null,
-            image: item.image || null,
-            category,
-            sortOrder: index,
           },
         });
+
+        if (!existingItem) {
+          await prisma.serviceItem.create({
+            data: {
+              serviceId: service.id,
+              itemId: item.id,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              unit: item.unit || null,
+              image: item.image || null,
+              category,
+              sortOrder: index,
+            },
+          });
+          console.log(`  Added item: ${item.name}`);
+        } else {
+          console.log(`  Item already exists: ${item.name}`);
+        }
       }
     }
   }
+
   console.log("Seeding finished.");
 }
 
