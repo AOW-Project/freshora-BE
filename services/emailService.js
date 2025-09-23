@@ -55,7 +55,7 @@ class EmailService {
 
     const businessMailOptions = {
       from: process.env.EMAIL_FROM,
-      to: "alensalim123@gmail.com", // Business email
+      to: process.env.EMAIL_FROM, // Business email
       subject: `📋 New Order Received - ${orderNumber}`,
       html: this.generateBusinessNotificationHTML(
         customerName,
