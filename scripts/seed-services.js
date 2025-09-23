@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-// ================= FULL SERVICE DATA =================
 const servicesData = [
   // ... (all your servicesData array content remains exactly the same)
   // 1. LAUNDRY SERVICES (WASH & PRESS)
