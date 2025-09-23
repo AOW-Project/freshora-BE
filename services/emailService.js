@@ -55,7 +55,7 @@ class EmailService {
 
     const businessMailOptions = {
       from: process.env.EMAIL_FROM,
-      to: process.env.EMAIL_FROM, // Business email
+      to: "alensalim123@gmail.com", // Business email
       subject: `📋 New Order Received - ${orderNumber}`,
       html: this.generateBusinessNotificationHTML(
         customerName,
@@ -269,7 +269,7 @@ The Laundry Service Team
                 <h4 style="margin: 0 0 10px 0; color: #92400e; display: flex; align-items: center;">
                     📝 <span style="margin-left: 8px;">Special Instructions</span>
                 </h4>
-                <p style="margin: 0; color: #92400e; font-style: italic;">"${specialInstructions}"</p>
+                <p style="margin: 0; color: #92400e; font-style: italic;">"${orderDetails.pickupInfo.instructions}"</p>
             </div>
             `
                 : ""
@@ -435,7 +435,7 @@ The Laundry Service Team
                 ? `
             <div style="background: #fef3c7; padding: 15px; margin: 20px 0; border-radius: 5px;">
                 <h4 style="margin-top: 0;">Special Instructions:</h4>
-                <p>${specialInstructions}</p>
+                <p>${orderDetails.pickupInfo.instructions}</p>
             </div>
             `
                 : ""

@@ -1,24 +1,48 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-async function seedService() {
-  await prisma.service.upsert({
-    where: { slug: "package-service" },
-    update: {}, // do nothing if it exists
+// change the "standard" to add new package
+
+async function seedServiceWithItem() {
+  // 1. Ensure service exists
+  const service = await prisma.service.upsert({
+    where: { slug: "standard-package-service" },
+    update: {},
     create: {
-      slug: "package-service",
-      title: "Package Service",
+      slug: "standard-package-service",
+      title: "Standard Package Service",
       description: "Basic laundry package",
-      fullDescription: "Full description of package service",
+      fullDescription: "Standard package service",
       rating: 5.0,
       reviews: 0,
       duration: "3 days",
       image: null,
     },
   });
-  console.log("Service seeded successfully");
+
+  console.log("Service seeded:", service.slug);
+
+  // 2. Add an item under this service
+  await prisma.serviceItem.upsert({
+    where: { id: "standard" }, // primary key reference
+    update: {},
+    create: {
+      id: "standard", // custom primary key
+      itemId: "standard-001", // 👈 required business ID
+      category: "Package Item", // 👈 required category
+      name: "Standard Package Items",
+      description: "Washing and Ironing of Items",
+      price: 18,
+      unit: "per package", // optional
+      image: null,
+      serviceId: service.id, // foreign key link
+      sortOrder: 1,
+    },
+  });
+
+  console.log("Service item seeded successfully");
 }
 
-seedService()
+seedServiceWithItem()
   .catch((e) => console.error(e))
   .finally(async () => await prisma.$disconnect());

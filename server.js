@@ -8,6 +8,7 @@ import ordersRoutes from "./routes/orders.js";
 import customersRoutes from "./routes/customers.js";
 import trackingRoutes from "./routes/tracking.js";
 import servicesRoutes from "./routes/services.js";
+import packageRoutes from "./routes/packages.js";
 import authRoutes from "./routes/auth.js";
 
 // Initialize Express app and Prisma Client
@@ -69,6 +70,7 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/customers", customersRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/services", servicesRoutes);
+app.use("/api/packages", packageRoutes);
 app.use("/api", authRoutes);
 
 // Health check endpoint
