@@ -20,7 +20,7 @@ const prisma = new PrismaClient();
 // Example: FRONTEND_URL=http://localhost:3000,https://your-production-site.com
 
 // for dev env
-// const allowedOrigins = ["https://freshoralaundry.com", "http://localhost:3000"];
+const allowedOrigins = ["https://freshoralaundry.com", "http://localhost:3000"];
 
 // app.use(
 //   cors({
