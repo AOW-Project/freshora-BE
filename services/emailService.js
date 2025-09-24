@@ -181,7 +181,7 @@ The Laundry Service Team
                 <span style="font-size: 36px;">🧺</span>
             </div>
             <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Order Confirmed!</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Your laundry is in expert hands</p>
+            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Your laundry is in expert hands, Here is your tracking ID </p>
             <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">
                 ${orderNumber}
             </div>
@@ -190,7 +190,7 @@ The Laundry Service Team
         <div style="padding: 30px;">
             <div style="text-align: center; margin-bottom: 30px;">
                 <h2 style="color: #16a34a; margin: 0 0 10px 0; font-size: 24px;">Hello ${customerName}! 👋</h2>
-                <p style="color: #6b7280; font-size: 16px; margin: 0;">Thank you for choosing our premium laundry service. Your order is confirmed and we're excited to take care of your garments!</p>
+                <p style="color: #6b7280; font-size: 16px; margin: 0;">Thank you for choosing our premium laundry service. Your order is confirmed, and we're excited to take care of your garments — we'll pick up your items within 1 hour!</p>
             </div>
             
             <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px;">
