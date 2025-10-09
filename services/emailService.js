@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
 
+const Backend_url = "https://api.freshoralaundry.com";
+// const Backend_url = "http://localhost:4000";
+
 class EmailService {
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -51,6 +54,33 @@ class EmailService {
         orderNumber,
         orderDetails
       ),
+      // attachments: [
+      //   {
+      //     filename: "FL-logo.png",
+      //     path: "./public/images/FL-logo.png",
+      //     cid: "logo",
+      //   },
+      //   {
+      //     filename: "Washing.png",
+      //     path: "./public/images/Washing.png",
+      //     cid: "washing",
+      //   },
+      //   {
+      //     filename: "Facebook.png",
+      //     path: "./public/images/Facebook.png",
+      //     cid: "facebook",
+      //   },
+      //   {
+      //     filename: "Whatsapp.png",
+      //     path: "./public/images/Whatsapp.png",
+      //     cid: "whatsapp",
+      //   },
+      //   {
+      //     filename: "Instagram.png",
+      //     path: "./public/images/Instagram.png",
+      //     cid: "instagram",
+      //   },
+      // ],
     };
 
     const businessMailOptions = {
@@ -166,162 +196,202 @@ The Laundry Service Team
       )
       .join("");
 
-    return `
-<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Order Confirmation - Premium Laundry Service</title>
-</head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1f2937; margin: 0; padding: 0; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
-    <div style="max-width: 650px; margin: 0 auto; background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
-        
-        <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 40px 30px; text-align: center; position: relative;">
-            <div style="background: rgba(255,255,255,0.1); width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 36px;">🧺</span>
-            </div>
-            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Order Confirmed!</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Your laundry is in expert hands, Here is your tracking ID </p>
-            <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                ${orderNumber}
-            </div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Order Confirmation - Freshora Laundry</title>
+  </head>
+  <body
+    style="
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    "
+  >
+    <div
+      style="
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <div
+        style="
+          background: white;
+
+          padding: 30px 30px;
+          text-align: left;
+          position: relative;
+          border-top: 5px solid #16a34a;
+          border-bottom: 5px solid #6b7280;
+        "
+      >
+        <table style="width: 100%">
+          <tr>
+            <td>
+              <img
+                src="${Backend_url}/images/FL-logo.png"
+                alt="Freshora-logo"
+                width="140"
+                style="display: block"
+              />
+            </td>
+            <td>
+              <h2
+                style="
+                  color: #16a34a;
+                  margin: 0 0 10px 0;
+                  font-size: 64px;
+                  font-weight: 600;
+                  text-align: center;
+                "
+              >
+                <span>Order</span> <span style="color: black">Confirmed!</span>
+              </h2>
+              <p
+                style="
+                  color: #6b7280;
+                  font-size: 24px;
+                  margin: 0;
+                  text-align: center;
+                "
+              >
+                Your laundry order has been recieved
+              </p>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="padding: 30px">
+        <div
+          style="
+            margin-bottom: 80px;
+            padding: 0px 80px;
+            color: #15803d;
+            font-size: 18px;
+          "
+        >
+          <h3>Hello ${customerName} !</h3>
+          <p>Thank you for choosing Freshora Laundry!</p>
+          <p>Your order has been confirmed and assigned tracking</p>
+          <p>ID: ${orderNumber}</p>
         </div>
-        
-        <div style="padding: 30px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 style="color: #16a34a; margin: 0 0 10px 0; font-size: 24px;">Hello ${customerName}! 👋</h2>
-                <p style="color: #6b7280; font-size: 16px; margin: 0;">Thank you for choosing our premium laundry service. Your order is confirmed, and we're excited to take care of your garments — we'll pick up your items within 1 hour!</p>
-            </div>
-            
-            <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px;">
-                <h3 style="margin: 0 0 20px 0; color: #1e293b; font-size: 18px; display: flex; align-items: center;">
-                    📋 <span style="margin-left: 8px;">Order Summary</span>
-                </h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Service Type</p>
-                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${orderDetails.cartItems[0].serviceSlug
-                          .replace("-", " ")
-                          .toUpperCase()}</p>
-                    </div>
-                    <div>
-                        <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Total Amount</p>
-                        <p style="margin: 0; color: #16a34a; font-weight: 700; font-size: 18px;">AED${totalAmount.toFixed(
-                          2
-                        )}</p>
-                    </div>
-                    <div>
-                        <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Pickup Date</p>
-                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${new Date(
-                          orderDetails.pickupInfo.date
-                        ).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}</p>
-                    </div>
-                    ${
-                      orderDetails.deliveryInfo.date
-                        ? `
-                    <div>
-                        <p style="margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;">Delivery Date</p>
-                        <p style="margin: 0; color: #1e293b; font-weight: 600;">${new Date(
-                          orderDetails.deliveryInfo.date
-                        ).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}</p>
-                    </div>
-                    `
-                        : ""
-                    }
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 25px;">
-                <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px; display: flex; align-items: center;">
-                    👕 <span style="margin-left: 8px;">Your Items</span>
-                </h3>
-                <div style="overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <table style="width: 100%; border-collapse: collapse; background: white;">
-                        <thead>
-                            <tr style="background: #f8fafc;">
-                                <th style="padding: 15px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #374151;">Item</th>
-                                <th style="padding: 15px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #374151;">Category</th>
-                                <th style="padding: 15px 12px; text-align: center; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #374151;">Qty</th>
-                                <th style="padding: 15px 12px; text-align: right; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #374151;">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHTML}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            ${
-              orderDetails.pickupInfo.instructions
-                ? `
-            <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-                <h4 style="margin: 0 0 10px 0; color: #92400e; display: flex; align-items: center;">
-                    📝 <span style="margin-left: 8px;">Special Instructions</span>
-                </h4>
-                <p style="margin: 0; color: #92400e; font-style: italic;">"${orderDetails.pickupInfo.instructions}"</p>
-            </div>
-            `
-                : ""
-            }
-            
-            <div style="background: #f0f9ff; border: 1px solid #0ea5e9; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
-                <h4 style="margin: 0 0 20px 0; color: #0c4a6e; font-size: 18px; display: flex; align-items: center;">
-                    🚀 <span style="margin-left: 8px;">What Happens Next?</span>
-                </h4>
-                <div style="display: grid; gap: 15px;">
-                    <div style="display: flex; align-items: center;">
-                        <div style="background: #0ea5e9; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">1</div>
-                        <span style="color: #0c4a6e; font-weight: 500;">We'll confirm your pickup time within 24 hours</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <div style="background: #0ea5e9; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">2</div>
-                        <span style="color: #0c4a6e; font-weight: 500;">Our professional team collects your items</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <div style="background: #0ea5e9; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">3</div>
-                        <span style="color: #0c4a6e; font-weight: 500;">Expert cleaning with premium care</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <div style="background: #0ea5e9; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 15px;">4</div>
-                        <span style="color: #0c4a6e; font-weight: 500;">Fresh, clean delivery to your door</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL}/track/${orderNumber}" 
-                   style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">
-                    📱 Track Your Order
-                </a>
-            </div>
-            
-            <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
-                <p style="margin: 0 0 10px 0; color: #6b7280;">Questions? We're here to help!</p>
-                <p style="margin: 0; color: #16a34a; font-weight: 600;">📧 ${
-                  process.env.EMAIL_FROM
-                }</p>
-            </div>
+
+        <div style="text-align: center; margin: 30px 0; display:none">
+          <a
+            href="${process.env.FRONTEND_URL}/track/${orderNumber}"
+            style="
+              background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+              color: white;
+              padding: 15px 30px;
+              text-decoration: none;
+              border-radius: 8px;
+              display: inline-block;
+              font-weight: 600;
+              font-size: 16px;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+              transition: all 0.3s ease;
+            "
+          >
+            Track Your Order
+          </a>
         </div>
-        
-        <div style="background: #1f2937; color: #d1d5db; padding: 25px 30px; text-align: center;">
-            <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Thank you for choosing our premium laundry service! 🌟</p>
-            <p style="margin: 0; font-size: 12px; opacity: 0.8;">© 2024 Premium Laundry Service. All rights reserved.</p>
-        </div>
+      </div>
+      <div
+        style="max-width: 800px; padding: 20px 80px; background-color: #15803d"
+      >
+        <table>
+          <tr>
+            <td>
+              <div style="color: white; line-height: 10px">
+                <p style="font-size: 20px; font-weight: 300">
+                  We Keep Your Clothes Fresh
+                </p>
+                <h2 style="font-size: 40px; font-weight: 700">Laundry</h2>
+                <h2 style="font-size: 40px; font-weight: 700">Services</h2>
+                <p style="font-size: 47px; font-weight: 200">Made Simple</p>
+                <p
+                  style="
+                    font-size: 20px;
+                    font-weight: 400;
+                    text-decoration: none;
+                  "
+                >
+                  www.freshoralaundry.com
+                </p>
+              </div>
+            </td>
+            <td align="right">
+              <img src="${Backend_url}/images/washing.png" alt="Washing-machine" width="341" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div
+        style="
+          background: #171717;
+          border-top: 3px solid white;
+          color: #d1d5db;
+          padding: 20px 80px;
+          text-align: left;
+        "
+      >
+        <table>
+          <thead style="color: #15803d; font-size: 24px; font-weight: 600">
+            <tr>
+              <th>Address</th>
+              <th style="width: 20px"></th>
+              <th>Contacts</th>
+            </tr>
+          </thead>
+          <tbody style="font-size: 16px; font-weight: 400">
+            <tr>
+              <td>
+                <div style="text-wrap: nowrap">
+                  <div>Shop no 4, Azizi Riviera 42,</div>
+                  <div>Meydan, Al Merkadh,</div>
+                  <div>Dubai UAE</div>
+                </div>
+              </td>
+              <td></td>
+              <td>
+                <div style="text-wrap: nowrap">
+                  <div>Monday - Friday : 8am to 8pm</div>
+                  <div>Saturday - Sunday : 10am to 8pm</div>
+                  <div>freshorappc@gmail.com</div>
+                  <div>+971 50 925 9667</div>
+                </div>
+              </td>
+              <td style="width: 20px"></td>
+              <td align="right">
+                <img
+                  src="${Backend_url}/images/facebook.png"
+                  alt="Facebook"
+                  width="40"
+                  style="margin-right: 10px"
+                />
+                <img
+                  src="${Backend_url}/images/whatsapp.png"
+                  alt="WhatsApp"
+                  width="40"
+                  style="margin-right: 10px"
+                />
+                <img src="${Backend_url}/images/instagram.png" alt="Instagram" width="40" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</body>
+  </body>
 </html>
-    `;
+`;
   }
 
   generateBusinessNotificationHTML(customerName, orderNumber, orderDetails) {
@@ -348,7 +418,7 @@ The Laundry Service Team
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${
           item.quantity
         }</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${(
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">AED ${(
           item.price * item.quantity
         ).toFixed(2)}</td>
       </tr>
@@ -359,96 +429,201 @@ The Laundry Service Team
     return `
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>New Order Notification</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #dc2626; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">🚨 NEW ORDER RECEIVED</h1>
-            <p style="margin: 10px 0 0 0;">Order #${orderNumber}</p>
-        </div>
-        
-        <div style="padding: 20px; background: #f9f9f9;">
-            <h2>Customer Information</h2>
-            <div style="background: white; padding: 15px; margin: 10px 0; border-left: 4px solid #dc2626;">
+  </head>
+  <body
+    style="
+      font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+        'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+    "
+  >
+    <div style="max-width: 800px; margin: 0 auto; padding: 20px">
+      <div
+        style="
+          background: #2e6f40;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          height: 180px;
+        "
+      >
+        <h1 style="margin: 0; font-size: 64px; font-weight: 600">
+          New Order Received
+        </h1>
+        <p style="margin: 10px 0 0 0; font-size: 20px; font-weight: 600">
+          Order #${orderNumber}
+        </p>
+      </div>
+      <table
+        width="100%"
+        cellpadding="10"
+        cellspacing="0"
+        border="0"
+        style="background: white"
+      >
+        <tr>
+          <td width="50%" valign="top">
+            <div>
+              <h2
+                style="color: #003d28; text-wrap: nowrap; font-weight: lighter"
+              >
+                Customer Information
+              </h2>
+              <div
+                style="
+                  background: #f3f6f4;
+                  padding: 15px;
+                  margin: 10px 0;
+                  font-size: 16px;
+                  border-radius: 10px;
+                  border: 1px solid #cccccc;
+                "
+              >
                 <p><strong>Name:</strong> ${customerName}</p>
                 <p><strong>Email:</strong> ${customerInfo?.email || "N/A"}</p>
                 <p><strong>Phone:</strong> ${customerInfo?.phone || "N/A"}</p>
-                <p><strong>Address:</strong> ${
-                  customerInfo?.address || "N/A"
-                }</p>
+                <p>
+                  <strong>Address:</strong> ${customerInfo?.address || "N/A"}
+                </p>
                 ${
                   customerInfo?.city
-                    ? `<p><strong>City:</strong> ${customerInfo.city}</p>`
+                    ? `
+                <p><strong>City:</strong> ${customerInfo.city}</p>
+                `
                     : ""
-                }
-                ${
-                  customerInfo?.zipCode
-                    ? `<p><strong>Zip Code:</strong> ${customerInfo.zipCode}</p>`
-                    : ""
-                }
+                } ${
+      customerInfo?.zipCode
+        ? `
+                <p><strong>Zip Code:</strong> ${customerInfo.zipCode}</p>
+                `
+        : ""
+    }
+              </div>
             </div>
-            
-            <h2>Order Details</h2>
-            <div style="background: white; padding: 15px; margin: 10px 0; border-left: 4px solid #dc2626;">
-                <div style="display:flex; flex-direction:row; gap:20px ">
-                <p><strong>Pickup Date:</strong> ${new Date(
-                  orderDetails.pickupInfo.date
-                ).toLocaleDateString()}</p>
-                <p style="padding-left:20px"><strong>Pickup Time:</strong> ${
-                  orderDetails.pickupInfo.time
-                }</p>
+          </td>
+          <td width="50%" valign="top">
+            <div>
+              <h2 style="color: #003d28; font-weight: lighter">
+                Order Details
+              </h2>
+              <div
+                style="
+                  background: #f3f6f4;
+                  padding: 15px;
+                  margin: 10px 0;
+                  border-radius: 10px;
+                  border: 1px solid #cccccc;
+                "
+              >
+                <div style="display: flex; flex-direction: row; gap: 20px">
+                  <p>
+                    <strong>Pickup Date:</strong> ${new Date(
+                      orderDetails.pickupInfo.date
+                    ).toLocaleDateString()}
+                  </p>
+                  <p style="padding-left: 20px">
+                    <strong>Pickup Time:</strong> ${
+                      orderDetails.pickupInfo.time
+                    }
+                  </p>
                 </div>
-                
 
                 ${
                   orderDetails.deliveryInfo.date
-                    ? `<div style="display:flex; flex-direction:row;gap:20px"><p ><strong>Delivery Date:</strong> ${new Date(
-                        orderDetails.deliveryInfo.date
-                      ).toLocaleDateString()}</p><p style="padding-left:20px" ><strong>Delivery Time:</strong> ${
-                        orderDetails.deliveryInfo.time
-                      }</p></div>`
+                    ? `
+                <div style="display: flex; flex-direction: row; gap: 20px">
+                  <p>
+                    <strong>Delivery Date:</strong> ${new Date(
+                      orderDetails.deliveryInfo.date
+                    ).toLocaleDateString()}
+                  </p>
+                  <p style="padding-left: 20px">
+                    <strong>Delivery Time:</strong> ${
+                      orderDetails.deliveryInfo.time
+                    }
+                  </p>
+                </div>
+                `
                     : ""
                 }
-                <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
+                <p><strong>Total Amount:</strong> AED ${totalAmount.toFixed(
+                  2
+                )}</p>
+              </div>
             </div>
-            
-            <h3>Items:</h3>
-            <table style="width: 100%; border-collapse: collapse; background: white;">
-                <thead>
-                    <tr style="background: #f0f0f0;">
-                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Item</th>
-                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Category</th>
-                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Qty</th>
-                        <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHTML}
-                </tbody>
-            </table>
-            
-            ${
-              orderDetails.pickupInfo.instructions
-                ? `
-            <div style="background: #fef3c7; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                <h4 style="margin-top: 0;">Special Instructions:</h4>
-                <p>${orderDetails.pickupInfo.instructions}</p>
-            </div>
-            `
-                : ""
-            }
-            
-            <div style="background: #dc2626; color: white; padding: 15px; margin: 20px 0; border-radius: 5px; text-align: center;">
-                <h3 style="margin: 0;">⚡ ACTION REQUIRED</h3>
-                <p style="margin: 10px 0 0 0;">Please confirm pickup time and process this order</p>
-            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- order items -->
+      <div style="grid-column-start: 1; grid-column-end: 3">
+        <h2 style="color: #003d28; font-weight: lighter">Order Items</h2>
+        <div
+          style="
+            width: 100%;
+            padding: 10px;
+            background-color: #f3f6f4;
+            border-radius: 10px;
+            border: 1px solid #cccccc;
+          "
+        >
+          <table
+            style="width: 100%; border-collapse: collapse; background: #f3f6f4"
+          >
+            <thead>
+              <tr style="background: #606060; color: white">
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: left;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Item
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: left;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Category
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: center;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Qty
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: right;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHTML}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
+
     `;
   }
 

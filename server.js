@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config"; // Loads .env file into process.env
 import { PrismaClient } from "@prisma/client";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Import your route handlers
 import ordersRoutes from "./routes/orders.js";
@@ -10,6 +12,10 @@ import trackingRoutes from "./routes/tracking.js";
 import servicesRoutes from "./routes/services.js";
 import packageRoutes from "./routes/packages.js";
 import authRoutes from "./routes/auth.js";
+
+// Recreate __dirname and __filename for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Express app and Prisma Client
 const app = express();
@@ -47,6 +53,7 @@ app.use(
 // --- MIDDLEWARE ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 // --- API ROUTES ---
 app.use("/api/orders", ordersRoutes);
