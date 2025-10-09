@@ -285,7 +285,7 @@ The Laundry Service Team
 
         <div style="text-align: center; margin: 30px 0; display:none">
           <a
-            href="${process.env.FRONTEND_URL}/track/${orderNumber}"
+            href="${process.env.FRONTEND_URL}/tracking"
             style="
               background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
               color: white;
