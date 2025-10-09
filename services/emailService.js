@@ -328,7 +328,7 @@ The Laundry Service Team
               </div>
             </td>
             <td align="right">
-              <img src="${Backend_url}/images/washing.png" alt="Washing-machine" width="341" />
+              <img src="${Backend_url}/images/Washing.png" alt="Washing-machine" width="341" />
             </td>
           </tr>
         </table>
@@ -371,18 +371,18 @@ The Laundry Service Team
               <td style="width: 20px"></td>
               <td align="right">
                 <img
-                  src="${Backend_url}/images/facebook.png"
+                  src="${Backend_url}/images/Facebook.png"
                   alt="Facebook"
                   width="40"
                   style="margin-right: 10px"
                 />
                 <img
-                  src="${Backend_url}/images/whatsapp.png"
+                  src="${Backend_url}/images/Whatsapp.png"
                   alt="WhatsApp"
                   width="40"
                   style="margin-right: 10px"
                 />
-                <img src="${Backend_url}/images/instagram.png" alt="Instagram" width="40" />
+                <img src="${Backend_url}/images/Instagram.png" alt="Instagram" width="40" />
               </td>
             </tr>
           </tbody>
