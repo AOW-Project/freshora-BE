@@ -178,20 +178,47 @@ The Laundry Service Team
     const itemsHTML = cartItems
       .map(
         (item) => `
-      <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${
-          item.name
-        }</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280;">${
-          item.category
-        }</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 600;">${
-          item.quantity
-        }</td>
-        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600; color: #16a34a;">AED${(
-          item.price * item.quantity
-        ).toFixed(2)}</td>
-      </tr>
+   <tr>
+              <td
+                style="
+                  padding: 12px;
+                  border-bottom: 1px solid #e5e7eb;
+                  font-weight: 500;
+                "
+              >
+                ${item.name}
+              </td>
+              <td
+                style="
+                  padding: 12px;
+                  border-bottom: 1px solid #e5e7eb;
+                  color: #6b7280;
+                "
+              >
+                ${item.category}
+              </td>
+              <td
+                style="
+                  padding: 12px;
+                  border-bottom: 1px solid #e5e7eb;
+                  text-align: center;
+                  font-weight: 600;
+                "
+              >
+                ${item.quantity}
+              </td>
+              <td
+                style="
+                  padding: 12px;
+                  border-bottom: 1px solid #e5e7eb;
+                  text-align: right;
+                  font-weight: 600;
+                  color: #16a34a;
+                "
+              >
+                AED ${(item.price * item.quantity).toFixed(2)}
+              </td>
+            </tr>
     `
       )
       .join("");
@@ -283,24 +310,65 @@ The Laundry Service Team
           <p>ID: ${orderNumber}</p>
         </div>
 
-        <div style="text-align: center; margin: 30px 0; display:none">
-          <a
-            href="${process.env.FRONTEND_URL}/tracking"
-            style="
-              background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-              color: white;
-              padding: 15px 30px;
-              text-decoration: none;
-              border-radius: 8px;
-              display: inline-block;
-              font-weight: 600;
-              font-size: 16px;
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-              transition: all 0.3s ease;
-            "
-          >
-            Track Your Order
-          </a>
+        <div style="width: 100%">
+          <table style="width: 100%;  max-width: 700px" >
+            <thead>
+              <tr>
+                <th>Items</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHTML}
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td align="right">
+                  <p
+                    style="
+                      margin: 0;
+                      color: #16a34a;
+                      font-weight: 700;
+                      font-size: 18px;
+                    "
+                  >
+                    AED ${totalAmount.toFixed(2)}
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding: 30px">
+          <h3 style="font-weight: 600; color: #15803d">
+            Terms & Conditions - Freshora Laundry LLC
+          </h3>
+          <ul style="color: #15803d">
+            <li>Items not collected within 30 days may be disposed of.</li>
+            <li>
+              We are not responsible for valuables left in pockets or garments
+            </li>
+            <li>
+              Color fading, shrinkage, or texture change may occur due to fabric
+              quality
+            </li>
+            <li>No claim accepted after 7 days of delivery</li>
+            <li>100% stain removal not guaranteed</li>
+            <li>
+              Delicate, leather and designer items handled at owner's risk
+            </li>
+            <li>
+              Shoe, bag, carpet and curtain results may vary depending on
+              condition
+            </li>
+            <li>Express services subject to availability and extra charge</li>
+            <li>
+              Inspect items upon delivery, report any issues within 24 hours
+            </li>
+          </ul>
         </div>
       </div>
       <div
@@ -316,19 +384,25 @@ The Laundry Service Team
                 <h2 style="font-size: 40px; font-weight: 700">Laundry</h2>
                 <h2 style="font-size: 40px; font-weight: 700">Services</h2>
                 <p style="font-size: 47px; font-weight: 200">Made Simple</p>
-                <p
+                <a
+                  href="https://www.freshoralaundry.com"
                   style="
                     font-size: 20px;
                     font-weight: 400;
                     text-decoration: none;
+                    color: white;
                   "
                 >
                   www.freshoralaundry.com
-                </p>
+                </a>
               </div>
             </td>
             <td align="right">
-              <img src="${Backend_url}/images/Washing.png" alt="Washing-machine" width="341" />
+              <img
+                src="${Backend_url}/images/Washing.png"
+                alt="Washing-machine"
+                width="341"
+              />
             </td>
           </tr>
         </table>
@@ -382,7 +456,11 @@ The Laundry Service Team
                   width="40"
                   style="margin-right: 10px"
                 />
-                <img src="${Backend_url}/images/Instagram.png" alt="Instagram" width="40" />
+                <img
+                  src="${Backend_url}/images/Instagram.png"
+                  alt="Instagram"
+                  width="40"
+                />
               </td>
             </tr>
           </tbody>
@@ -391,6 +469,7 @@ The Laundry Service Team
     </div>
   </body>
 </html>
+
 `;
   }
 
@@ -532,24 +611,7 @@ The Laundry Service Team
                   </p>
                 </div>
 
-                ${
-                  orderDetails.deliveryInfo.date
-                    ? `
-                <div style="display: flex; flex-direction: row; gap: 20px">
-                  <p>
-                    <strong>Delivery Date:</strong> ${new Date(
-                      orderDetails.deliveryInfo.date
-                    ).toLocaleDateString()}
-                  </p>
-                  <p style="padding-left: 20px">
-                    <strong>Delivery Time:</strong> ${
-                      orderDetails.deliveryInfo.time
-                    }
-                  </p>
-                </div>
-                `
-                    : ""
-                }
+                
                 <p><strong>Total Amount:</strong> AED ${totalAmount.toFixed(
                   2
                 )}</p>
@@ -624,134 +686,6 @@ The Laundry Service Team
   </body>
 </html>
 
-    `;
-  }
-
-  generateOrderConfirmationHTML(customerName, orderNumber, orderDetails) {
-    // ... (this entire HTML template function is unchanged)
-    const {
-      service,
-      pickupDate,
-      deliveryDate,
-      totalAmount,
-      items,
-      specialInstructions,
-    } = orderDetails;
-
-    const itemsHTML = items
-      .map(
-        (item) => `
-      <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
-          item.name
-        }</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
-          item.category
-        }</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${
-          item.quantity
-        }</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">AED${(
-          item.price * item.quantity
-        ).toFixed(2)}</td>
-      </tr>
-    `
-      )
-      .join("");
-
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Order Confirmation</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: #16a34a; color: white; padding: 20px; text-align: center;">
-            <h1 style="margin: 0;">Order Confirmation</h1>
-            <p style="margin: 10px 0 0 0;">Thank you for choosing our laundry service!</p>
-        </div>
-        
-        <div style="padding: 20px; background: #f9f9f9;">
-            <h2>Hello ${customerName},</h2>
-            <p>Your order has been successfully placed and is being processed.</p>
-            
-            <div style="background: white; padding: 15px; margin: 20px 0; border-left: 4px solid #16a34a;">
-                <h3 style="margin-top: 0;">Order Details</h3>
-                <p><strong>Order Number:</strong> ${orderNumber}</p>
-                <p><strong>Service:</strong> ${service}</p>
-                <p><strong>Pickup Date:</strong> ${new Date(
-                  pickupDate
-                ).toLocaleDateString()}</p>
-                ${
-                  deliveryDate
-                    ? `<p><strong>Delivery Date:</strong> ${new Date(
-                        deliveryDate
-                      ).toLocaleDateString()}</p>`
-                    : ""
-                }
-                <p><strong>Total Amount:</strong> AED${totalAmount.toFixed(
-                  2
-                )}</p>
-            </div>
-            
-            <h3>Items Ordered:</h3>
-            <table style="width: 100%; border-collapse: collapse; background: white;">
-                <thead>
-                    <tr style="background: #f0f0f0;">
-                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Item</th>
-                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Category</th>
-                        <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Qty</th>
-                        <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ddd;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHTML}
-                </tbody>
-            </table>
-            
-            ${
-              specialInstructions
-                ? `
-            <div style="background: white; padding: 15px; margin: 20px 0;">
-                <h4>Special Instructions:</h4>
-                <p>${specialInstructions}</p>
-            </div>
-            `
-                : ""
-            }
-            
-            <div style="background: #e7f3ff; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                <h4 style="margin-top: 0;">What's Next?</h4>
-                <ol>
-                    <li>We'll confirm your pickup time within 24 hours</li>
-                    <li>Our team will collect your items on the scheduled date</li>
-                    <li>You'll receive updates as your order progresses</li>
-                    <li>Track your order anytime using the link below</li>
-                </ol>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL}/track/${orderNumber}" 
-                   style="background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                    Track Your Order
-                </a>
-            </div>
-            
-            <p>If you have any questions, please don't hesitate to contact us at ${
-              process.env.EMAIL_FROM
-            }</p>
-            
-            <p>Best regards,<br>The Laundry Service Team</p>
-        </div>
-        
-        <div style="background: #333; color: white; padding: 15px; text-align: center; font-size: 12px;">
-            <p>© 2024 Laundry Service. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>
     `;
   }
 }

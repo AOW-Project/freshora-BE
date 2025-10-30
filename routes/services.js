@@ -66,13 +66,17 @@ router.get(
       });
 
       if (!service) {
-        return res.status(404).json({ success: false, error: "Service not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Service not found" });
       }
       const transformedService = transformService(service);
       res.json({ success: true, data: transformedService });
     } catch (error) {
       console.error("Error fetching service:", error);
-      res.status(500).json({ success: false, error: "Failed to fetch service" });
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to fetch service" });
     }
   }
 );
@@ -89,10 +93,15 @@ router.post(
   async (req, res) => {
     try {
       const { slug, title, description } = req.body;
-      const existingService = await prisma.service.findUnique({ where: { slug } });
+      const existingService = await prisma.service.findUnique({
+        where: { slug },
+      });
 
       if (existingService) {
-        return res.status(409).json({ success: false, error: "A service with this slug already exists" });
+        return res.status(409).json({
+          success: false,
+          error: "A service with this slug already exists",
+        });
       }
 
       const newService = await prisma.service.create({
@@ -103,10 +112,16 @@ router.post(
           fullDescription: req.body.fullDescription || description,
         },
       });
-      res.status(201).json({ success: true, data: newService, message: "Service created successfully" });
+      res.status(201).json({
+        success: true,
+        data: newService,
+        message: "Service created successfully",
+      });
     } catch (error) {
       console.error("Error creating service:", error);
-      res.status(500).json({ success: false, error: "Failed to create service" });
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to create service" });
     }
   }
 );
@@ -123,13 +138,21 @@ router.put(
         where: { slug },
         data: req.body,
       });
-      res.json({ success: true, data: updatedService, message: "Service updated successfully" });
+      res.json({
+        success: true,
+        data: updatedService,
+        message: "Service updated successfully",
+      });
     } catch (error) {
-      if (error.code === 'P2025') {
-        return res.status(404).json({ success: false, error: "Service not found" });
+      if (error.code === "P2025") {
+        return res
+          .status(404)
+          .json({ success: false, error: "Service not found" });
       }
       console.error("Error updating service:", error);
-      res.status(500).json({ success: false, error: "Failed to update service" });
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to update service" });
     }
   }
 );
@@ -145,11 +168,15 @@ router.delete(
       await prisma.service.delete({ where: { slug } });
       res.json({ success: true, message: "Service deleted successfully" });
     } catch (error) {
-      if (error.code === 'P2025') {
-        return res.status(404).json({ success: false, error: "Service not found" });
+      if (error.code === "P2025") {
+        return res
+          .status(404)
+          .json({ success: false, error: "Service not found" });
       }
       console.error("Error deleting service:", error);
-      res.status(500).json({ success: false, error: "Failed to delete service" });
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to delete service" });
     }
   }
 );
@@ -170,7 +197,9 @@ router.post(
       const service = await prisma.service.findUnique({ where: { slug } });
 
       if (!service) {
-        return res.status(404).json({ success: false, error: "Service not found" });
+        return res
+          .status(404)
+          .json({ success: false, error: "Service not found" });
       }
 
       const { name, category, price, description, unit, image } = req.body;
@@ -185,7 +214,11 @@ router.post(
           image,
         },
       });
-      res.status(201).json({ success: true, data: newItem, message: "Item added successfully" });
+      res.status(201).json({
+        success: true,
+        data: newItem,
+        message: "Item added successfully",
+      });
     } catch (error) {
       console.error("Error adding item:", error);
       res.status(500).json({ success: false, error: "Failed to add item" });

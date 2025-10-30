@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>New Order Notification</title>
+  </head>
+  <body
+    style="
+      font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+        'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+    "
+  >
+    <div style="max-width: 800px; margin: 0 auto; padding: 20px">
+      <div
+        style="
+          background: #2e6f40;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          height: 180px;
+        "
+      >
+        <h1 style="margin: 0; font-size: 64px; font-weight: 600">
+          New Order Received
+        </h1>
+        <p style="margin: 10px 0 0 0; font-size: 20px; font-weight: 600">
+          Order #${orderNumber}
+        </p>
+      </div>
+      <table
+        width="100%"
+        cellpadding="10"
+        cellspacing="0"
+        border="0"
+        style="background: white"
+      >
+        <tr>
+          <td width="50%" valign="top">
+            <div>
+              <h2
+                style="color: #003d28; text-wrap: nowrap; font-weight: lighter"
+              >
+                Customer Information
+              </h2>
+              <div
+                style="
+                  background: #f3f6f4;
+                  padding: 15px;
+                  margin: 10px 0;
+                  font-size: 16px;
+                  border-radius: 10px;
+                  border: 1px solid #cccccc;
+                "
+              >
+                <p><strong>Name:</strong> ${customerName}</p>
+                <p><strong>Email:</strong> ${customerInfo?.email || "N/A"}</p>
+                <p><strong>Phone:</strong> ${customerInfo?.phone || "N/A"}</p>
+                <p>
+                  <strong>Address:</strong> ${customerInfo?.address || "N/A"}
+                </p>
+                ${ customerInfo?.city ? `
+                <p><strong>City:</strong> ${customerInfo.city}</p>
+                ` : "" } ${ customerInfo?.zipCode ? `
+                <p><strong>Zip Code:</strong> ${customerInfo.zipCode}</p>
+                ` : "" }
+              </div>
+            </div>
+          </td>
+          <td width="50%" valign="top">
+            <div>
+              <h2 style="color: #003d28; font-weight: lighter">
+                Order Details
+              </h2>
+              <div
+                style="
+                  background: #f3f6f4;
+                  padding: 15px;
+                  margin: 10px 0;
+                  border-radius: 10px;
+                  border: 1px solid #cccccc;
+                "
+              >
+                <div style="display: flex; flex-direction: row; gap: 20px">
+                  <p>
+                    <strong>Pickup Date:</strong> ${new Date(
+                    orderDetails.pickupInfo.date ).toLocaleDateString()}
+                  </p>
+                  <p style="padding-left: 20px">
+                    <strong>Pickup Time:</strong> ${
+                    orderDetails.pickupInfo.time }
+                  </p>
+                </div>
+
+                <p>
+                  <strong>Total Amount:</strong> AED ${totalAmount.toFixed( 2 )}
+                </p>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- order items -->
+      <div style="grid-column-start: 1; grid-column-end: 3">
+        <h2 style="color: #003d28; font-weight: lighter">Order Items</h2>
+        <div
+          style="
+            width: 100%;
+            padding: 10px;
+            background-color: #f3f6f4;
+            border-radius: 10px;
+            border: 1px solid #cccccc;
+          "
+        >
+          <table
+            style="width: 100%; border-collapse: collapse; background: #f3f6f4"
+          >
+            <thead>
+              <tr style="background: #606060; color: white">
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: left;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Item
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: left;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Category
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: center;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Qty
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: right;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHTML}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
