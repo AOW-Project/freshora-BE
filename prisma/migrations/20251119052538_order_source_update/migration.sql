@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `orders` ADD COLUMN `source` ENUM('ONLINE', 'OFFLINE') NOT NULL DEFAULT 'ONLINE';

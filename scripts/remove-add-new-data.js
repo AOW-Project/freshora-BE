@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const servicesData = [
   // 1. LAUNDRY SERVICES (WASH & PRESS)
   {
-    slug: "laundry-services",
+    slug: "professional-laundry-services-in-dubai",
     title: "Laundry Services (Wash & Press)",
     description: "Professional wash and press for all your clothing needs.",
     fullDescription:
@@ -270,7 +270,7 @@ const servicesData = [
 
   // 2. DRY CLEANING SERVICES
   {
-    slug: "dry-cleaning-services",
+    slug: "dry-cleaning-services-in-dubai",
     title: "Dry Cleaning Services",
     description: "Professional dry cleaning for delicate and formal garments.",
     fullDescription:
@@ -525,7 +525,7 @@ const servicesData = [
 
   // 3. EXPRESS LAUNDRY
   {
-    slug: "express-laundry-services",
+    slug: "express-laundry-services-in-dubai",
     title: "Express Laundry Services",
     description: "Same-day laundry services for when you're in a hurry.",
     fullDescription:
@@ -547,7 +547,7 @@ const servicesData = [
 
   // 4. SHOE & BAG SPA
   {
-    slug: "shoe-bag-spa",
+    slug: "shoe-and-bag-spa-services-in-dubai",
     title: "Shoe Cleaning",
     description: "Premium cleaning and restoration services for footwears.",
     fullDescription:
@@ -589,7 +589,7 @@ const servicesData = [
 
   // 5. LUXURY SHOE CLEANING
   {
-    slug: "luxury-shoe-cleaning",
+    slug: "luxury-shoe-cleaning-services-in-dubai",
     title: "Luxury Shoe Cleaning",
     description: "Specialized care for high-end designer shoes.",
     fullDescription:
@@ -623,7 +623,7 @@ const servicesData = [
 
   // 6. COMMERCIAL LAUNDRY
   {
-    slug: "commercial-laundry-service",
+    slug: "commercial-laundry-services-in-dubai",
     title: "Commercial Laundry Service",
     description: "Bulk laundry services for businesses and institutions.",
     fullDescription:
@@ -723,7 +723,7 @@ const servicesData = [
 
   // 7. CURTAIN CLEANING
   {
-    slug: "curtain-cleaning-service",
+    slug: "curtain-cleaning-services-in-dubai",
     title: "Curtain Cleaning",
     description:
       "Professional cleaning for all your household items, including curtains.",
@@ -746,7 +746,7 @@ const servicesData = [
 
   // 8. CARPET CLEANING
   {
-    slug: "carpet-cleaning-services",
+    slug: "carpet-cleaning-services-in-dubai",
     title: "Carpet Cleaning Service",
     description:
       "Specialized washing and steam cleaning for all types of carpets.",
@@ -766,7 +766,7 @@ const servicesData = [
         {
           id: "cc2",
           name: "Premium Carpet - Silk, Wool, Persian, etc (wash only)",
-          price: 80,
+          price: 25,
           description: "Per square meter, for delicate carpets",
         },
         {
@@ -793,7 +793,7 @@ const servicesData = [
 
   // 9. SOFT TOY CLEANING
   {
-    slug: "soft-toy-cleaning-service",
+    slug: "soft-toy-cleaning-services-in-dubai",
     title: "Soft Toy Cleaning Service",
     description: "Gentle and hygienic cleaning for soft toys.",
     fullDescription:
@@ -814,7 +814,7 @@ const servicesData = [
   },
   // 10. STEAM PRESSING SERVICES
   {
-    slug: "steam-pressing-service",
+    slug: "steam-pressing-services-in-dubai",
     title: "Steam Pressing Service",
     description:
       "Professional steam pressing for delicate and formal garments.",
@@ -1047,6 +1047,8 @@ const servicesData = [
     },
   },
 ];
+
+const singleServiceData = [];
 
 // Alternative version with transaction for better safety
 async function mainWithTransaction() {
