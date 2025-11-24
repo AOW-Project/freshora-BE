@@ -3,6 +3,13 @@ import Joi from "joi";
 import { prisma } from "../lib/prisma.js";
 import emailService from "../services/emailService.js";
 
+import multer from "multer";
+import { uploadToS3, deleteFromS3 } from "../lib/s3.js";
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
 const router = express.Router();
 
 // Validation schema for incoming order data
@@ -41,6 +48,7 @@ const createOrderSchema = Joi.object({
     .required(),
   totalAmount: Joi.number().positive().required(),
   paymentMethod: Joi.string().optional().allow(""),
+  source: Joi.string().valid("ONLINE", "OFFLINE").optional(),
 });
 
 // Helper function to generate a unique order number
@@ -75,6 +83,7 @@ router.post("/", async (req, res) => {
       deliveryInfo,
       cartItems,
       totalAmount,
+      source,
     } = value;
     const orderNumber = generateOrderNumber();
 
@@ -118,6 +127,7 @@ router.post("/", async (req, res) => {
           specialInstructions: pickupInfo.instructions || "",
           totalAmount,
           status: "PENDING",
+          source: source || "ONLINE",
         },
       });
 
@@ -235,7 +245,7 @@ router.get("/:orderNumber", async (req, res) => {
       where: { orderNumber },
       include: {
         customer: true,
-        items: true,
+        items: { include: { orderItemRemark: true } },
         statusHistory: {
           orderBy: { createdAt: "desc" },
         },
@@ -365,9 +375,6 @@ router.put("/:orderNumber", async (req, res) => {
   }
 });
 
-
-
-
 // GET /api/orders - Get all orders (for admin dashboard)
 router.get("/", async (req, res) => {
   try {
@@ -411,52 +418,49 @@ router.get("/", async (req, res) => {
     }
 
     // Search functionality (orderNumber, customer name, email, phone)
-if (search) {
-  where.OR = [
-    // Search by order number
-    {
-      orderNumber: {
-        contains: search
-      }
-    },
+    if (search) {
+      where.OR = [
+        // Search by order number
+        {
+          orderNumber: {
+            contains: search,
+          },
+        },
 
-    // Search by customer name
-    {
-      customer: {
-        is: {
-          name: {
-            contains: search
-          }
-        }
-      }
-    },
+        // Search by customer name
+        {
+          customer: {
+            is: {
+              name: {
+                contains: search,
+              },
+            },
+          },
+        },
 
-    // Search by customer email
-    {
-      customer: {
-        is: {
-          email: {
-            contains: search
-          }
-        }
-      }
-    },
+        // Search by customer email
+        {
+          customer: {
+            is: {
+              email: {
+                contains: search,
+              },
+            },
+          },
+        },
 
-    // Search by customer phone
-    {
-      customer: {
-        is: {
-          phone: {
-            contains: search
-          }
-        }
-      }
+        // Search by customer phone
+        {
+          customer: {
+            is: {
+              phone: {
+                contains: search,
+              },
+            },
+          },
+        },
+      ];
     }
-  ];
-}
-
-
-
 
     // -----------------------------
     // FETCH DATA
@@ -502,5 +506,89 @@ if (search) {
   }
 });
 
+// Update remark image
+router.post(
+  "/:orderId/items/:itemId/remark/image",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { itemId } = req.params;
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Image file is required",
+        });
+      }
+
+      // Upload to S3
+      const imageUrl = await uploadToS3(
+        req.file.buffer,
+        req.file.originalname,
+        "order-item-remarks"
+      );
+
+      // If remark exists, delete previous image from S3
+      const existing = await prisma.orderItemRemark.findUnique({
+        where: { orderItemId: itemId },
+      });
+
+      if (existing?.imageUrl) {
+        await deleteFromS3(existing.imageUrl);
+      }
+
+      // Upsert remark with new image
+      const remark = await prisma.orderItemRemark.upsert({
+        where: { orderItemId: itemId },
+        create: {
+          orderItemId: itemId,
+          imageUrl,
+        },
+        update: {
+          imageUrl,
+        },
+      });
+
+      return res.json({
+        success: true,
+        message: "Remark image uploaded successfully",
+        remark,
+      });
+    } catch (error) {
+      console.error("[REMARK IMAGE ERROR]:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to upload remark image",
+        error: error.message,
+      });
+    }
+  }
+);
+
+// Update Text Remark API
+router.post("/:orderId/items/:itemId/remark", async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { remarks } = req.body;
+
+    const remark = await prisma.orderItemRemark.upsert({
+      where: { orderItemId: itemId },
+      create: { orderItemId: itemId, remarks },
+      update: { remarks },
+    });
+
+    res.json({
+      success: true,
+      message: "Remark updated",
+      remark,
+    });
+  } catch (error) {
+    console.error("[REMARK TEXT ERROR]:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update remark",
+    });
+  }
+});
 
 export default router;

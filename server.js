@@ -19,7 +19,11 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Express app and Prisma Client
 const app = express();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({  transactionOptions: {
+    maxWait: 10000,  // 10 seconds
+    timeout: 20000,  // 20 seconds
+  },
+});
 
 // --- CORS CONFIGURATION ---
 // This configuration allows you to specify allowed frontend URLs in your .env file

@@ -113,11 +113,12 @@ model OrderItem {
   subtotal    Float
   createdAt   DateTime @default(now())
 
-  order         Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  service       Service     @relation(fields: [serviceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  serviceId     String
-  serviceItem   ServiceItem @relation(fields: [serviceItemId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  serviceItemId String
+  order           Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  service         Service          @relation(fields: [serviceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  serviceId       String
+  serviceItem     ServiceItem      @relation(fields: [serviceItemId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  serviceItemId   String
+  orderItemRemark OrderItemRemark?
 
   @@map("order_items")
 }
@@ -145,6 +146,9 @@ model CartItem {
   service     Service     @relation(fields: [serviceId], references: [id])
   serviceItem ServiceItem @relation(fields: [serviceItemId], references: [id])
 
+  remark            OrderItemRemark? @relation(fields: [orderItemRemarkId], references: [id])
+  orderItemRemarkId String?
+
   @@unique([cartId, serviceItemId])
   @@map("cart_items")
 }
@@ -160,4 +164,18 @@ enum OrderStatus {
 enum OrderSource {
   ONLINE
   OFFLINE
+}
+
+model OrderItemRemark {
+  id          String   @id @default(cuid())
+  orderItemId String   @unique
+  remarks     String?  @db.Text
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItem OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
+
+  @@map("order_item_remarks")
 }
