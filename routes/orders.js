@@ -607,4 +607,63 @@ router.post("/:orderId/items/:itemId/remark", async (req, res) => {
   }
 });
 
+// DELETE /api/orders/:orderNumber
+router.delete("/:orderNumber", async (req, res) => {
+  const { orderNumber } = req.params;
+
+  try {
+    // Find the order
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: { items: true },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    //  Delete related data manually (since some relations are optional)
+
+    // Delete remarks linked to orderItems
+    await prisma.orderItemRemark.deleteMany({
+      where: {
+        orderItemId: {
+          in: order.items.map((i) => i.id),
+        },
+      },
+    });
+
+    // Delete order items
+    await prisma.orderItem.deleteMany({
+      where: { orderId: order.id },
+    });
+
+    // Delete status history
+    await prisma.orderStatusHistory.deleteMany({
+      where: { orderId: order.id },
+    });
+
+    // Finally delete the order
+    await prisma.order.delete({
+      where: { id: order.id },
+    });
+
+    return res.json({
+      success: true,
+      message: "Order and all related data deleted successfully",
+    });
+  } catch (error) {
+    console.error("[ORDER DELETE ERROR]", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete order",
+      error: error.message,
+    });
+  }
+});
+
 export default router;
