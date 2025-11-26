@@ -6,13 +6,13 @@ const prisma = new PrismaClient();
 async function seedServiceWithItem() {
   // 1. Ensure service exists
   const service = await prisma.service.upsert({
-    where: { slug: "standard-package-service" },
-    update: {},
+    where: { slug: "custom-service" },
+    update: { title: "Custom Service" },
     create: {
-      slug: "standard-package-service",
-      title: "Standard Package Service",
-      description: "Basic laundry package",
-      fullDescription: "Standard package service",
+      slug: "custom-service",
+      title: "Custom Service",
+      description: "Custom laundry service",
+      fullDescription: "Custom laundry service",
       rating: 5.0,
       reviews: 0,
       duration: "3 days",
@@ -23,24 +23,24 @@ async function seedServiceWithItem() {
   console.log("Service seeded:", service.slug);
 
   // 2. Add an item under this service
-  await prisma.serviceItem.upsert({
-    where: { id: "standard" }, // primary key reference
-    update: {},
-    create: {
-      id: "standard", // custom primary key
-      itemId: "standard-001", // 👈 required business ID
-      category: "Package Item", // 👈 required category
-      name: "Standard Package Items",
-      description: "Washing and Ironing of Items",
-      price: 18,
-      unit: "per package", // optional
-      image: null,
-      serviceId: service.id, // foreign key link
-      sortOrder: 1,
-    },
-  });
+  // await prisma.serviceItem.upsert({
+  //   where: { id: "custom" }, // primary key reference
+  //   update: {},
+  //   create: {
+  //     id: "custom", // custom primary key
+  //     itemId: "custom-001", //  required business ID
+  //     category: "Custom Item", //  required category
+  //     name: "custom Package Items",
+  //     description: "Custom service description",
+  //     price: null,
+  //     unit: "per package", // optional
+  //     image: null,
+  //     serviceId: service.id, // foreign key link
+  //     sortOrder: 1,
+  //   },
+  // });
 
-  console.log("Service item seeded successfully");
+  // console.log("Service item seeded successfully");
 }
 
 seedServiceWithItem()

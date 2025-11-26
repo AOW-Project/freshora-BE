@@ -49,6 +49,7 @@ const createOrderSchema = Joi.object({
   totalAmount: Joi.number().positive().required(),
   paymentMethod: Joi.string().optional().allow(""),
   source: Joi.string().valid("ONLINE", "OFFLINE").optional(),
+  isCustom: Joi.boolean().optional(),
 });
 
 // Helper function to generate a unique order number
@@ -134,37 +135,52 @@ router.post("/", async (req, res) => {
       console.log("[DEBUG] Order created:", order.id);
 
       // Create order items with better error handling
-      const orderItemsData = cartItems.map((item, index) => {
-        console.log(`[DEBUG] Processing cart item ${index}:`, item);
+      const orderItemsData = await Promise.all(
+        cartItems.map(async (item) => {
+          let serviceId = null;
+          let serviceItemId = null;
+          let isCustom = false;
+          let customServiceId = null;
+          let customItemId = null;
 
-        // Handle different ID formats more robustly
-        let serviceId = "unknown";
-        let serviceItemId = "unknown";
+          const parts = item.id.split("-");
 
-        if (item.id && typeof item.id === "string") {
-          const idParts = item.id.split("-");
-          if (idParts.length >= 2) {
-            serviceId = idParts[0];
-            serviceItemId = idParts.slice(1).join("-"); // Handle IDs with multiple dashes
+          // check if DB item exists
+          const dbItem = await prisma.serviceItem.findUnique({
+            where: { id: parts[1] },
+          });
+
+          if (dbItem) {
+            serviceId = parts[0];
+            serviceItemId = parts[1];
           } else {
-            serviceId = item.id;
-            serviceItemId = item.id;
+            // custom item
+            isCustom = true;
+            customServiceId = parts[0];
+            customItemId = parts[1];
           }
-        }
 
-        return {
-          orderId: order.id,
-          itemId: item.id,
-          itemName: item.name,
-          category: item.category,
-          serviceType: item.serviceSlug,
-          price: Number(item.price),
-          quantity: Number(item.quantity),
-          subtotal: Number(item.price) * Number(item.quantity),
-          serviceId: serviceId,
-          serviceItemId: serviceItemId,
-        };
-      });
+          return {
+            orderId: order.id,
+            itemId: item.id,
+            itemName: item.name,
+            category: item.category,
+            serviceType: item.serviceSlug,
+            price: item.price,
+            quantity: item.quantity,
+            subtotal: item.price * item.quantity,
+
+            // DB items
+            serviceId,
+            serviceItemId,
+
+            // custom items
+            isCustom,
+            customServiceId,
+            customItemId,
+          };
+        })
+      );
 
       console.log("[DEBUG] Order items data:", orderItemsData);
 

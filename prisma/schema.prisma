@@ -113,11 +113,15 @@ model OrderItem {
   subtotal    Float
   createdAt   DateTime @default(now())
 
+  isCustom        Boolean @default(false)
+  customServiceId String?
+  customItemId    String?
+
   order           Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  service         Service          @relation(fields: [serviceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  serviceId       String
-  serviceItem     ServiceItem      @relation(fields: [serviceItemId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  serviceItemId   String
+  service         Service?         @relation(fields: [serviceId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  serviceId       String?
+  serviceItem     ServiceItem?     @relation(fields: [serviceItemId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  serviceItemId   String?
   orderItemRemark OrderItemRemark?
 
   @@map("order_items")
