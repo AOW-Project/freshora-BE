@@ -11,6 +11,7 @@ import customersRoutes from "./routes/customers.js";
 import trackingRoutes from "./routes/tracking.js";
 import servicesRoutes from "./routes/services.js";
 import packageRoutes from "./routes/packages.js";
+import expensesRoutes from "./routes/expenses.js";
 import authRoutes from "./routes/auth.js";
 
 // Recreate __dirname and __filename for ES modules
@@ -19,9 +20,10 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Express app and Prisma Client
 const app = express();
-const prisma = new PrismaClient({  transactionOptions: {
-    maxWait: 10000,  // 10 seconds
-    timeout: 20000,  // 20 seconds
+const prisma = new PrismaClient({
+  transactionOptions: {
+    maxWait: 10000, // 10 seconds
+    timeout: 20000, // 20 seconds
   },
 });
 
@@ -65,6 +67,7 @@ app.use("/api/customers", customersRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/packages", packageRoutes);
+app.use("/api/expenses", expensesRoutes);
 app.use("/api", authRoutes);
 
 // Health check endpoint
