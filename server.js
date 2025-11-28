@@ -12,6 +12,8 @@ import trackingRoutes from "./routes/tracking.js";
 import servicesRoutes from "./routes/services.js";
 import packageRoutes from "./routes/packages.js";
 import expensesRoutes from "./routes/expenses.js";
+import downloadRoutes from "./routes/downloads.js";
+import statsRoutes from "./routes/stats.js";
 import authRoutes from "./routes/auth.js";
 
 // Recreate __dirname and __filename for ES modules
@@ -68,6 +70,8 @@ app.use("/api/tracking", trackingRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/expenses", expensesRoutes);
+app.use("/api/downloads", downloadRoutes);
+app.use("/api/stats", statsRoutes);
 app.use("/api", authRoutes);
 
 // Health check endpoint
