@@ -10,7 +10,7 @@ class EmailService {
       secure: false,
       auth: {
         user: process.env.EMAIL_USER || "freshorappc@gmail.com",
-        pass: process.env.GMAIL_APP_PASSWORD || "ykbl euac vysy dpta", // Gmail App Password
+        pass: process.env.GMAIL_APP_PASSWORD || "borm bxii pjkp cnzc", // Gmail App Password
       },
     });
   }
