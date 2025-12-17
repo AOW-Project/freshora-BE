@@ -164,16 +164,7 @@ The Laundry Service Team
   }
 
   generateCustomerBrochureHTML(customerName, orderNumber, orderDetails) {
-    // ... (this entire HTML template function is unchanged)
-    const {
-      name,
-      customerInfo,
-      pickupInfo,
-      deliveryInfo,
-      cartItems,
-      totalAmount,
-      paymentMethod,
-    } = orderDetails;
+    const { cartItems, totalAmount } = orderDetails;
 
     const itemsHTML = cartItems
       .map(
@@ -187,6 +178,15 @@ The Laundry Service Team
                 "
               >
                 ${item.name}
+              </td>
+              <td
+                style="
+                  padding: 12px;
+                  border-bottom: 1px solid #e5e7eb;
+                  font-weight: 500;
+                "
+              >
+                ${item.serviceSlug}
               </td>
               <td
                 style="
@@ -315,6 +315,7 @@ The Laundry Service Team
             <thead>
               <tr>
                 <th>Items</th>
+                <th>Service</th>
                 <th>Category</th>
                 <th>Quantity</th>
                 <th>price</th>
@@ -323,6 +324,7 @@ The Laundry Service Team
             <tbody>
               ${itemsHTML}
               <tr>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -444,24 +446,34 @@ The Laundry Service Team
               </td>
               <td style="width: 20px"></td>
               <td align="right">
-                <img
-                  src="${Backend_url}/images/Facebook.png"
-                  alt="Facebook"
-                  width="40"
-                  style="margin-right: 10px"
-                />
-                <img
-                  src="${Backend_url}/images/Whatsapp.png"
-                  alt="WhatsApp"
-                  width="40"
-                  style="margin-right: 10px"
-                />
-                <img
-                  src="${Backend_url}/images/Instagram.png"
-                  alt="Instagram"
-                  width="40"
-                />
-              </td>
+  <a href="https://www.facebook.com/profile.php?id=61579978694620"
+     style="display:inline-block;text-decoration:none;"
+     target="_blank">
+    <img src="${Backend_url}/images/Facebook.png"
+         alt="Facebook"
+         width="40"
+         style="display:inline-block;margin-right:10px;border:0;" />
+  </a>
+
+  <a href="https://wa.me/971509259667"
+     style="display:inline-block;text-decoration:none;"
+     target="_blank">
+    <img src="${Backend_url}/images/Whatsapp.png"
+         alt="WhatsApp"
+         width="40"
+         style="display:inline-block;margin-right:10px;border:0;" />
+  </a>
+
+  <a href="https://www.instagram.com/freshoralaundry/"
+     style="display:inline-block;text-decoration:none;"
+     target="_blank">
+    <img src="${Backend_url}/images/Instagram.png"
+         alt="Instagram"
+         width="40"
+         style="display:inline-block;border:0;" />
+  </a>
+</td>
+
             </tr>
           </tbody>
         </table>
@@ -474,15 +486,7 @@ The Laundry Service Team
   }
 
   generateBusinessNotificationHTML(customerName, orderNumber, orderDetails) {
-    const {
-      name,
-      customerInfo,
-      pickupInfo,
-      deliveryInfo,
-      cartItems,
-      totalAmount,
-      paymentMethod,
-    } = orderDetails;
+    const { customerInfo, cartItems, totalAmount } = orderDetails;
 
     const itemsHTML = cartItems
       .map(
@@ -490,6 +494,9 @@ The Laundry Service Team
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${
           item.name
+        }</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${
+          item.serviceSlug
         }</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${
           item.category
@@ -646,6 +653,15 @@ The Laundry Service Team
                   "
                 >
                   Item
+                </th>
+                <th
+                  style="
+                    padding: 10px;
+                    text-align: left;
+                    border-bottom: 2px solid #ddd;
+                  "
+                >
+                  Service
                 </th>
                 <th
                   style="
