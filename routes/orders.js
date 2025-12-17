@@ -19,7 +19,7 @@ const createOrderSchema = Joi.object({
     email: Joi.string().email().required(),
     phone: Joi.string().optional().allow(""),
     address: Joi.string().required().min(3),
-    city: Joi.string().optional().min(2),
+    city: Joi.string().optional().allow(""),
     zipCode: Joi.string().optional().allow("").min(3),
   }).required(),
   pickupInfo: Joi.object({
