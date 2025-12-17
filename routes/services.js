@@ -4,14 +4,16 @@ import { prisma } from "../lib/prisma.js";
 
 const router = express.Router();
 
+const PRIORITY_CATEGORIES = ["men", "women", "children", "household"];
+
 // Helper function to transform service data to group items by category
 const transformService = (service) => {
   if (!service) return null;
 
-  const itemsByCategory = service.items.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
+  // Step 1: Group items by category
+  const grouped = service.items.reduce((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
+
     acc[item.category].push({
       id: item.id,
       name: item.name,
@@ -19,13 +21,35 @@ const transformService = (service) => {
       description: item.description || "",
       unit: item.unit || "Per Item",
       image: item.image,
+      sortOrder: item.sortOrder ?? 0,
     });
+
     return acc;
   }, {});
 
+  // Step 2: Build ordered result
+  const orderedItems = {};
+
+  // 2a: Add priority categories first
+  PRIORITY_CATEGORIES.forEach((category) => {
+    if (grouped[category]) {
+      orderedItems[category] = grouped[category].sort(
+        (a, b) => a.sortOrder - b.sortOrder
+      );
+      delete grouped[category]; // important
+    }
+  });
+
+  // 2b: Append remaining categories dynamically
+  Object.keys(grouped).forEach((category) => {
+    orderedItems[category] = grouped[category].sort(
+      (a, b) => a.sortOrder - b.sortOrder
+    );
+  });
+
   return {
     ...service,
-    items: itemsByCategory,
+    items: orderedItems,
   };
 };
 
