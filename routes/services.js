@@ -250,4 +250,103 @@ router.post(
   }
 );
 
+/**
+ * DELETE /api/service-items/:id
+ * Deletes a single service item
+ */
+router.delete(
+  "/items/:id",
+  [param("id").notEmpty().withMessage("ServiceItem ID is required")],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // 🔍 Check if item exists
+      const serviceItem = await prisma.serviceItem.findUnique({
+        where: { id },
+      });
+
+      if (!serviceItem) {
+        return res.status(404).json({
+          success: false,
+          message: "Service item not found",
+        });
+      }
+
+      // 🗑️ Delete service item
+      await prisma.serviceItem.delete({
+        where: { id },
+      });
+
+      return res.json({
+        success: true,
+        message: "Service item deleted successfully",
+        deletedItemId: id,
+      });
+    } catch (error) {
+      console.error("Error deleting service item:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete service item",
+      });
+    }
+  }
+);
+/**
+ * PATCH /api/service/items/:id/price
+ * Update price of a service item
+ */
+router.patch(
+  "/items/:id/price",
+  [
+    param("id").notEmpty().withMessage("ServiceItem ID is required"),
+    body("price")
+      .isFloat({ gt: 0 })
+      .withMessage("Price must be a number greater than 0"),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { price } = req.body;
+
+      // 🔍 Check if item exists
+      const serviceItem = await prisma.serviceItem.findUnique({
+        where: { id },
+      });
+
+      if (!serviceItem) {
+        return res.status(404).json({
+          success: false,
+          message: "Service item not found",
+        });
+      }
+
+      // 💰 Update price
+      const updatedItem = await prisma.serviceItem.update({
+        where: { id },
+        data: { price },
+      });
+
+      return res.json({
+        success: true,
+        message: "Service item price updated successfully",
+        data: {
+          id: updatedItem.id,
+          name: updatedItem.name,
+          oldPrice: serviceItem.price,
+          newPrice: updatedItem.price,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating service item price:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update service item price",
+      });
+    }
+  }
+);
+
 export default router;
